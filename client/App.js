@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Page, AppProvider } from '@shopify/polaris';
 
 import ApiConsole from './components/ApiConsole'
+import Main from './components/Main'
 
 class App extends Component {
   render() {
@@ -14,6 +15,8 @@ class App extends Component {
           breadcrumbs={[{ content: 'Home', url: '/foo' }]}
           primaryAction={{ content: 'Add something' }}
         >
+          <Main />
+          <div style={{ height: '300px' }} />
           <ApiConsole />
         </Page>
       </AppProvider>

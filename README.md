@@ -1,3 +1,8 @@
+https://5f83ffd291939330192ebe0d2fc15b1b:34221ba927709488f07c7a42a2efea97@inscopestore.myshopify.com/admin/orders.json
+
+https://9eab69d9.ngrok.io/shopify/auth/callback
+
+
 # Shopify Node App
 
 The goal of this example app is to provide a starting point for Shopify app developers so that they will be able to quickly
