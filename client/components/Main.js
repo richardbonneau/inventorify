@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import ListedProduct from './ListedProduct'
+
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
 export default class Main extends Component {
@@ -16,7 +18,7 @@ export default class Main extends Component {
     componentDidMount() {
         //  Logique pour le OnClick Event
         document.querySelector('body').addEventListener('click', (event) => {
-            if (event.target.tagName.toLowerCase() === 'li') {
+            if (event.target.tagName.toLowerCase() === 'button') {
                 var isAlreadyInArray = false;
                 this.state.selectedProductsByUser.forEach((id) => {
                     if (event.target.id === id) isAlreadyInArray = true;
@@ -25,7 +27,6 @@ export default class Main extends Component {
                     this.setState({
                         selectedProductsByUser: this.state.selectedProductsByUser.concat(event.target.id)
                     })
-                    this.enableCheckboxOnSelectedProducts()
                 } else {
                     var indexOfItemWeWillRemove = this.state.selectedProductsByUser.indexOf(event.target.id)
                     this.setState({
@@ -35,31 +36,33 @@ export default class Main extends Component {
                                     return true;
                                 }
                                 else {
+                                    //  Putting this var to -1 ensures that we won't filter any more elements
                                     indexOfItemWeWillRemove = -1;
                                     return false;
                                 }
                             })
                     })
-                    this.enableCheckboxOnSelectedProducts()
+
                 }
+                console.log("products in list: ", this.state.selectedProductsByUser)
             }
         })
     }
 
-    enableCheckboxOnSelectedProducts = () => {
-        let arr = this.state.checkboxesArr;
-        this.state.fetched.forEach((i, ind) => {
-            this.state.selectedProductsByUser.forEach((j) => {
-                console.log("first check", i.id.toString() === j, "arr ind", arr[ind])
-                if (i.id.toString() === j && arr[ind] === false) {
-                    arr[ind] = true;
-                } else if ((i.id.toString() === j && arr[ind] === true)) {
-                    arr[ind] = false;
-                }
-            })
-        })
-        this.setState({ checkboxesArr: arr })
-    }
+    // enableCheckboxOnSelectedProducts = () => {
+    //     let arr = this.state.checkboxesArr;
+    //     this.state.fetched.forEach((i, ind) => {
+    //         this.state.selectedProductsByUser.forEach((j) => {
+    //             //console.log("first check", i.id.toString() === j, "arr ind", arr[ind])
+    //             if (i.id.toString() === j && arr[ind] === false) {
+    //                 arr[ind] = true;
+    //             } else if ((i.id.toString() === j && arr[ind] === true)) {
+    //                 arr[ind] = false;
+    //             }
+    //         })
+    //     })
+    //     this.setState({ checkboxesArr: arr })
+    // }
 
 
     testFetch = (value) => {
@@ -85,18 +88,27 @@ export default class Main extends Component {
     checkObj = (value) => {
         console.log("before setstate", this.state.checkboxesArr)
     }
+    // renderList = () => {
+    //     let newArr = [];
+    //     let lify = this.state.fetched.map((product, ind) => {
+    //         newArr.push(false)
+    //         console.log(newArr)
+    //         return (<li id={product.id}>{product.title} <Checkbox checked={this.state.checkboxesArr[ind]} /> </li>)
+    //     })
+    //     this.setState({ checkboxesArr: newArr, lifyedList: lify })
+    //     console.log("apres renderList", this.state, "newArr", newArr)
+    // }
+    // showSelectedProducts = () => {
+    //     alert(this.state.selectedProductsByUser)
+    // }
+
     renderList = () => {
         let newArr = [];
         let lify = this.state.fetched.map((product, ind) => {
-            newArr.push(false)
-            console.log(newArr)
-            return (<li id={product.id}>{product.title} <Checkbox checked={this.state.checkboxesArr[ind]} /> </li>)
+            return <ListedProduct title={product.title} id={product.id} checked={false} />
         })
-        this.setState({ checkboxesArr: newArr, lifyedList: lify })
-        console.log("apres renderList", this.state, "newArr", newArr)
-    }
-    showSelectedProducts = () => {
-        alert(this.state.selectedProductsByUser)
+
+        this.setState({ lifyedList: lify })
     }
 
     render() {
