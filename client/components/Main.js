@@ -42,29 +42,13 @@ export default class Main extends Component {
                                 }
                             })
                     })
-
                 }
                 console.log("products in list: ", this.state.selectedProductsByUser)
             }
         })
     }
 
-    // enableCheckboxOnSelectedProducts = () => {
-    //     let arr = this.state.checkboxesArr;
-    //     this.state.fetched.forEach((i, ind) => {
-    //         this.state.selectedProductsByUser.forEach((j) => {
-    //             //console.log("first check", i.id.toString() === j, "arr ind", arr[ind])
-    //             if (i.id.toString() === j && arr[ind] === false) {
-    //                 arr[ind] = true;
-    //             } else if ((i.id.toString() === j && arr[ind] === true)) {
-    //                 arr[ind] = false;
-    //             }
-    //         })
-    //     })
-    //     this.setState({ checkboxesArr: arr })
-    // }
-
-
+    //  En attendant d'avoir accès à l'api inventory
     testFetch = (value) => {
         console.log("fetching")
         let fetchedJson = {};
@@ -88,19 +72,6 @@ export default class Main extends Component {
     checkObj = (value) => {
         console.log("before setstate", this.state.checkboxesArr)
     }
-    // renderList = () => {
-    //     let newArr = [];
-    //     let lify = this.state.fetched.map((product, ind) => {
-    //         newArr.push(false)
-    //         console.log(newArr)
-    //         return (<li id={product.id}>{product.title} <Checkbox checked={this.state.checkboxesArr[ind]} /> </li>)
-    //     })
-    //     this.setState({ checkboxesArr: newArr, lifyedList: lify })
-    //     console.log("apres renderList", this.state, "newArr", newArr)
-    // }
-    // showSelectedProducts = () => {
-    //     alert(this.state.selectedProductsByUser)
-    // }
 
     renderList = () => {
         let newArr = [];
