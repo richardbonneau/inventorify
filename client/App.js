@@ -17,7 +17,7 @@ class App extends Component {
         >
           <Main />
           <div style={{ height: '300px' }} />
-          <ApiConsole />
+          {/* <ApiConsole /> */}
         </Page>
       </AppProvider>
     );

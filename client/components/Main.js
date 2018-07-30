@@ -6,23 +6,25 @@ import { Layout, TextField, FormLayout, Select, Button } from '@shopify/polaris'
 import { userInfo } from 'os';
 
 export default class Main extends Component {
+    storeLocation = 14069366849;
+
     constructor(props) {
         super(props);
         this.state = {
-            categorySelect: "poches",
             searchInput: "",
+            categorySelect: "poches",
             isSearchLoading: false,
 
             fetched: [],
             listOfSearchedProduct: [],
             lifyedList: [],
+
             selectedProductsByUser: []
         }
     }
 
     componentDidMount() {
         //  Logique pour le OnClick Event
-        //  
         document.querySelector('body').addEventListener('click', (event) => {
             if (event.target.tagName.toLowerCase() === 'button' && event.target.id !== "") {
 
@@ -83,10 +85,9 @@ export default class Main extends Component {
         this.setState({ listOfSearchedProduct: filteredArr })
     }
     renderList = () => {
-        let lify = this.state.listOfSearchedProduct.map((product, ind) => {
-            return <ListedProduct title={product.title} id={product.id} checked={false} />
+        let lify = this.state.listOfSearchedProduct.map((product) => {
+            return <ListedProduct title={product.title} id={product.variants[0].inventory_item_id} checked={false} />
         })
-
         this.setState({ lifyedList: lify })
     }
 
@@ -102,10 +103,25 @@ export default class Main extends Component {
 
     //  Test Stuff
     testFetch = (value) => {
-        return fetch('/shopify/api/inventory_items/12603583463489.json')
+        return fetch('/shopify/api/inventory_levels.json?inventory_item_ids=12737606451265,12623115354177')
             .then(response => response.json())
             .then(responseJson => {
-                this.putDataInState(responseJson);
+                console.log(responseJson);
+            })
+    }
+    testPostFetch = (value) => {
+        let stringBody = {
+            "inventory_item_id": 12737606451265,
+            "location_id": this.storeLocation,
+            "available": 200
+        }
+        return fetch('/shopify/api/inventory_levels/set.json', {
+            method: "POST",
+            body: JSON.stringify(stringBody)
+        })
+            .then(response => response.json())
+            .then(responseJson => {
+                console.log(responseJson);
             })
     }
     checkObj = (value) => {
@@ -126,7 +142,7 @@ export default class Main extends Component {
                     Debug
                 <Button size="slim" onClick={this.checkObj}>Check State</Button>
                     <Button size="slim" onClick={this.testFetch}>Test Fetch</Button>
-                    <Button size="slim" onClick={this.renderList}>Create List</Button>
+                    <Button size="slim" onClick={this.testPostFetch}>Test Post Fetch</Button>
                 </div>
                 <div style={{ height: '15px' }} />
 
