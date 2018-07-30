@@ -2,23 +2,30 @@ import React, { Component } from 'react';
 
 import ListedProduct from './ListedProduct'
 
-import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
+import { Layout, TextField, FormLayout, Select, Button } from '@shopify/polaris';
+import { userInfo } from 'os';
 
 export default class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            categorySelect: "poches",
+            searchInput: "",
+            isSearchLoading: false,
+
             fetched: [],
+            listOfSearchedProduct: [],
             lifyedList: [],
-            selectedProductsByUser: [],
-            checkboxesArr: []
+            selectedProductsByUser: []
         }
     }
 
     componentDidMount() {
         //  Logique pour le OnClick Event
+        //  
         document.querySelector('body').addEventListener('click', (event) => {
-            if (event.target.tagName.toLowerCase() === 'button') {
+            if (event.target.tagName.toLowerCase() === 'button' && event.target.id !== "") {
+
                 var isAlreadyInArray = false;
                 this.state.selectedProductsByUser.forEach((id) => {
                     if (event.target.id === id) isAlreadyInArray = true;
@@ -48,17 +55,18 @@ export default class Main extends Component {
         })
     }
 
-    //  En attendant d'avoir accès à l'api inventory
-    testFetch = (value) => {
-        console.log("fetching")
-        let fetchedJson = {};
+    //  Search
+    searchFetch = () => {
+        //  On reset l'array "selectedProduct by User" et "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
+        this.setState({ selectedProductsByUser: [], lifyedList: [], isSearchLoading: true })
         return fetch('/shopify/api/products.json')
             .then(response => response.json())
             .then(responseJson => {
-                console.log(responseJson);
-                fetchedJson = responseJson;
-                this.putDataInState(fetchedJson);
+                this.setState({ isSearchLoading: false })
+                this.putDataInState(responseJson);
             })
+            .then(() => { this.searchForKeywords(this.state.searchInput, this.state.fetched) })
+            .then(() => { this.renderList() })
     }
     putDataInState = (object) => {
         let list = [];
@@ -67,36 +75,84 @@ export default class Main extends Component {
         })
         this.setState({ fetched: list })
     }
-
-    //  Button Methods
-    checkObj = (value) => {
-        console.log("before setstate", this.state.checkboxesArr)
+    searchForKeywords(searchInput, fetched) {
+        let filteredArr = fetched.filter((product) => {
+            let lowerCaseTitle = product.title.toLowerCase();
+            return lowerCaseTitle.includes(searchInput.toLowerCase());
+        })
+        this.setState({ listOfSearchedProduct: filteredArr })
     }
-
     renderList = () => {
-        let newArr = [];
-        let lify = this.state.fetched.map((product, ind) => {
+        let lify = this.state.listOfSearchedProduct.map((product, ind) => {
             return <ListedProduct title={product.title} id={product.id} checked={false} />
         })
 
         this.setState({ lifyedList: lify })
     }
 
+
+    //  Handlers
+    handleSelectChange = (value) => {
+        this.setState({ categorySelect: value })
+    }
+    handleSearchChange = (value) => {
+        this.setState({ searchInput: value })
+    }
+
+
+    //  Test Stuff
+    testFetch = (value) => {
+        return fetch('/shopify/api/inventory_items/12603583463489.json')
+            .then(response => response.json())
+            .then(responseJson => {
+                this.putDataInState(responseJson);
+            })
+    }
+    checkObj = (value) => {
+        console.log("state", this.state)
+    }
+
+
     render() {
-        console.log("render", this.state)
+        const options = [
+            { label: "Poches", value: "poches" },
+            { label: "Bas", value: "bas" },
+            { label: "Boxer", value: "boxer" },
+            { label: "Case Téléphone", value: "case" },
+        ]
         return (
             <div>
-                <div>Main.js</div>
-                <Button onClick={this.testFetch}>Fetch Json Data</Button>
-                <div />
-                <Button onClick={this.renderList}>Create List</Button>
-                <div />
-                <Button onClick={this.checkObj}>Check State</Button>
+                <div style={{ border: '2px solid black', padding: '5px', display: 'flex', justifyContent: 'space-around' }} >
+                    Debug
+                <Button size="slim" onClick={this.checkObj}>Check State</Button>
+                    <Button size="slim" onClick={this.testFetch}>Test Fetch</Button>
+                    <Button size="slim" onClick={this.renderList}>Create List</Button>
+                </div>
+                <div style={{ height: '15px' }} />
+
+                <FormLayout.Group>
+                    <TextField
+                        label="Rechercher"
+                        onChange={this.handleSearchChange}
+                        value={this.state.searchInput}
+                        placeholder="exemple: Leg Day"
+                    />
+                    <Select
+                        label="Catégorie"
+                        options={options}
+                        onChange={this.handleSelectChange}
+                        value={this.state.categorySelect}
+                    />
+                </FormLayout.Group>
+                <div style={{ height: '10px' }} />
+                <Button loading={this.state.isSearchLoading} size="slim" onClick={this.searchFetch}>Rechercher</Button>
+
+                <div style={{ height: '40px' }} />
 
                 <ul>
                     {this.state.lifyedList}
                 </ul>
-                <Button onClick={this.showSelectedProducts}>Show Selected Products</Button>
+                <Button size="slim" >Modifier les produits sélectionnés</Button>
             </div>
         )
     }

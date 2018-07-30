@@ -19,10 +19,11 @@ export default class ListedProduct extends Component {
     }
 
     render() {
-        console.log("in component", this.props.checked)
         return (
             <li  >
-                <Button id={this.props.id}
+                <Button
+                    id={this.props.id}
+                    class="productButton"
                     clicked={this.props.clicked}
                     onClick={this.handleChange}
                 >
