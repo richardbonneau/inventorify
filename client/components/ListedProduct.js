@@ -7,6 +7,7 @@ export default class ListedProduct extends Component {
         super(props);
         this.state = {
             checked: false,
+            testObj: { test: "string" }
         }
     }
 
@@ -20,11 +21,9 @@ export default class ListedProduct extends Component {
 
     render() {
         return (
-            <li  >
+            <li class="productButton">
                 <Button
                     id={this.props.id}
-                    class="productButton"
-                    clicked={this.props.clicked}
                     onClick={this.handleChange}
                 >
                     {this.props.title}

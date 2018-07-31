@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import ListedProduct from './ListedProduct'
+import ProductModif from './ProductModif'
 
 import { Layout, TextField, FormLayout, Select, Button } from '@shopify/polaris';
 import { userInfo } from 'os';
@@ -17,9 +18,13 @@ export default class Main extends Component {
 
             fetched: [],
             listOfSearchedProduct: [],
-            lifyedList: [],
+            lifyedSearch: [],
 
-            selectedProductsByUser: []
+            selectedProductsByUser: [],
+            selectedProductsObjects: [],
+            lifyedModif: [],
+            quantityInput: "",
+            priceInput: "",
         }
     }
 
@@ -27,8 +32,8 @@ export default class Main extends Component {
         //  Logique pour le OnClick Event
         document.querySelector('body').addEventListener('click', (event) => {
             if (event.target.tagName.toLowerCase() === 'button' && event.target.id !== "") {
-
-                var isAlreadyInArray = false;
+                console.log("eventtarget", event.target);
+                let isAlreadyInArray = false;
                 this.state.selectedProductsByUser.forEach((id) => {
                     if (event.target.id === id) isAlreadyInArray = true;
                 })
@@ -37,7 +42,7 @@ export default class Main extends Component {
                         selectedProductsByUser: this.state.selectedProductsByUser.concat(event.target.id)
                     })
                 } else {
-                    var indexOfItemWeWillRemove = this.state.selectedProductsByUser.indexOf(event.target.id)
+                    let indexOfItemWeWillRemove = this.state.selectedProductsByUser.indexOf(event.target.id)
                     this.setState({
                         selectedProductsByUser:
                             this.state.selectedProductsByUser.filter(el => {
@@ -52,15 +57,16 @@ export default class Main extends Component {
                             })
                     })
                 }
-                console.log("products in list: ", this.state.selectedProductsByUser)
+                //console.log("products in list: ", this.state.selectedProductsByUser)
             }
         })
     }
 
+
     //  Search
     searchFetch = () => {
         //  On reset l'array "selectedProduct by User" et "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
-        this.setState({ selectedProductsByUser: [], lifyedList: [], isSearchLoading: true })
+        this.setState({ selectedProductsByUser: [], lifyedSearch: [], isSearchLoading: true })
         return fetch('/shopify/api/products.json')
             .then(response => response.json())
             .then(responseJson => {
@@ -68,7 +74,7 @@ export default class Main extends Component {
                 this.putDataInState(responseJson);
             })
             .then(() => { this.searchForKeywords(this.state.searchInput, this.state.fetched) })
-            .then(() => { this.renderList() })
+            .then(() => { this.renderSearchList() })
     }
     putDataInState = (object) => {
         let list = [];
@@ -84,21 +90,34 @@ export default class Main extends Component {
         })
         this.setState({ listOfSearchedProduct: filteredArr })
     }
-    renderList = () => {
+    renderSearchList = () => {
         let lify = this.state.listOfSearchedProduct.map((product) => {
-            return <ListedProduct title={product.title} id={product.variants[0].inventory_item_id} checked={false} />
+            return <ListedProduct title={product.title} id={product.id} checked={false} />
         })
-        this.setState({ lifyedList: lify })
+        this.setState({ lifyedSearch: lify })
+    }
+
+
+    //  Modif
+    renderModifList = () => {
+        let listObjects = [];
+        this.state.selectedProductsByUser.forEach((selected) => {
+            this.state.listOfSearchedProduct.forEach((searched) => {
+                if (Number(selected) === searched.id) { listObjects.push(searched); }
+            })
+        })
+        let lify = listObjects.map((product) => {
+            return <ProductModif title={product.title} variants={product.variants} checked={false} />
+        })
+        this.setState({ lifyedModif: lify })
     }
 
 
     //  Handlers
-    handleSelectChange = (value) => {
-        this.setState({ categorySelect: value })
-    }
-    handleSearchChange = (value) => {
-        this.setState({ searchInput: value })
-    }
+    handleSelectChange = (value) => { this.setState({ categorySelect: value }) }
+    handleSearchChange = (value) => { this.setState({ searchInput: value }) }
+    handleQuantityChange = (value) => { this.setState({ quantityInput: value }) }
+    handlePriceChange = (value) => { this.setState({ priceInput: value }) }
 
 
     //  Test Stuff
@@ -140,7 +159,7 @@ export default class Main extends Component {
             <div>
                 <div style={{ border: '2px solid black', padding: '5px', display: 'flex', justifyContent: 'space-around' }} >
                     Debug
-                <Button size="slim" onClick={this.checkObj}>Check State</Button>
+                    <Button size="slim" onClick={this.checkObj}>Check State</Button>
                     <Button size="slim" onClick={this.testFetch}>Test Fetch</Button>
                     <Button size="slim" onClick={this.testPostFetch}>Test Post Fetch</Button>
                 </div>
@@ -161,15 +180,31 @@ export default class Main extends Component {
                     />
                 </FormLayout.Group>
                 <div style={{ height: '10px' }} />
-                <Button loading={this.state.isSearchLoading} size="slim" onClick={this.searchFetch}>Rechercher</Button>
+                <Button fullWidth={true} loading={this.state.isSearchLoading} size="slim" onClick={this.searchFetch}>Rechercher</Button>
 
-                <div style={{ height: '40px' }} />
-
+                <hr />
                 <ul>
-                    {this.state.lifyedList}
+                    {this.state.lifyedSearch}
                 </ul>
-                <Button size="slim" >Modifier les produits sélectionnés</Button>
-            </div>
+                <hr />
+
+                <Button fullWidth={true} onClick={this.renderModifList} size="slim">Modifier les produits sélectionnés</Button>
+
+                <hr />
+                <ul>
+                    {this.state.lifyedModif}
+                </ul>
+                <hr />
+
+                <FormLayout.Group>
+                    <TextField label="Quantité" onChange={this.handleQuantityChange} />
+                    <TextField label="Prix" onChange={this.handlePriceChange} />
+                </FormLayout.Group>
+
+                <div style={{ height: '5px' }} />
+
+                <Button primary fullWidth={true} >Appliquer les changements</Button>
+            </div >
         )
     }
 }
