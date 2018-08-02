@@ -2,6 +2,8 @@ https://5f83ffd291939330192ebe0d2fc15b1b:34221ba927709488f07c7a42a2efea97@inscop
 
 https://9eab69d9.ngrok.io/shopify/auth/callback
 
+dezoutil inventory_item_id: 13106935496769
+
 
 # Shopify Node App
 

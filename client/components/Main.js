@@ -112,6 +112,49 @@ export default class Main extends Component {
         this.setState({ lifyedModif: lify })
     }
 
+    applyChanges = () => {
+        for (let i = 0; i < 2; i++) {
+            let variantId = 12952003969089;
+            let inventoryId = 13106935496769;
+            if (i === 1) variantId = 12952004001857;
+            if (i === 1) inventoryId = 13081242042433;
+
+            let inventoryBody = {
+                "inventory_item_id": inventoryId,
+                "location_id": this.storeLocation,
+                "available": 66
+            }
+            let priceBody = {
+                "variant": {
+                    "id": variantId,
+                    "price": "666.0"
+                }
+            }
+            return fetch('/shopify/api/inventory_levels/set.json', {
+                method: "POST",
+                body: JSON.stringify(inventoryBody)
+            })
+                .then(response => response.json())
+                .then(responseJson => {
+                    console.log(responseJson);
+                    console.log("i", i)
+                    return fetch('/shopify/api/variants/12952003969089.json', {
+                        method: "PUT",
+                        body: JSON.stringify(priceBody)
+                    })
+                        .then(response => response.json())
+                        .then(responseJson => {
+                            console.log(responseJson)
+                            console.log("i", i)
+                        })
+                })
+        }
+    }
+
+
+
+
+
 
     //  Handlers
     handleSelectChange = (value) => { this.setState({ categorySelect: value }) }
@@ -120,28 +163,47 @@ export default class Main extends Component {
     handlePriceChange = (value) => { this.setState({ priceInput: value }) }
 
 
-    //  Test Stuff
+    //  Test Stuff 1417274753089
     testFetch = (value) => {
-        return fetch('/shopify/api/inventory_levels.json?inventory_item_ids=12737606451265,12623115354177')
-            .then(response => response.json())
-            .then(responseJson => {
-                console.log(responseJson);
-            })
-    }
-    testPostFetch = (value) => {
-        let stringBody = {
-            "inventory_item_id": 12737606451265,
+        let inventoryBody = {
+            "inventory_item_id": 13106935496769,
             "location_id": this.storeLocation,
-            "available": 200
+            "available": Number(this.state.quantityInput)
+        }
+        let priceBody = {
+            "variant": {
+                "id": 12952003969089,
+                "price": this.state.priceInput
+            }
         }
         return fetch('/shopify/api/inventory_levels/set.json', {
             method: "POST",
-            body: JSON.stringify(stringBody)
+            body: JSON.stringify(inventoryBody)
         })
             .then(response => response.json())
             .then(responseJson => {
                 console.log(responseJson);
+                return fetch('/shopify/api/variants/12952003969089.json', {
+                    method: "PUT",
+                    body: JSON.stringify(priceBody)
+                })
+                    .then(response => response.json())
+                    .then(responseJson => console.log(responseJson))
             })
+    }
+    testPostFetch = (value) => {
+        let priceBody = {
+            "variant": {
+                "id": 12952003969089,
+                "price": "99.00"
+            }
+        }
+        return fetch('/shopify/api/variants/12952003969089.json', {
+            method: "PUT",
+            body: JSON.stringify(priceBody)
+        })
+            .then(response => response.json())
+            .then(responseJson => console.log(responseJson))
     }
     checkObj = (value) => {
         console.log("state", this.state)
@@ -197,13 +259,13 @@ export default class Main extends Component {
                 <hr />
 
                 <FormLayout.Group>
-                    <TextField label="Quantité" onChange={this.handleQuantityChange} />
-                    <TextField label="Prix" onChange={this.handlePriceChange} />
+                    <TextField label="Quantité" type="number" onChange={this.handleQuantityChange} value={this.state.quantityInput} />
+                    <TextField label="Prix" prefix="$" type="number" onChange={this.handlePriceChange} value={this.state.priceInput} />
                 </FormLayout.Group>
 
-                <div style={{ height: '5px' }} />
+                <div style={{ height: '15px' }} />
 
-                <Button primary fullWidth={true} >Appliquer les changements</Button>
+                <Button primary fullWidth={true} onClick={this.applyChanges} >Appliquer les changements</Button>
             </div >
         )
     }
