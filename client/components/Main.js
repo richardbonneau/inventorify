@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
 import ListedProduct from './ListedProduct'
-import ProductModif from './ProductModif'
+import ListedVariant from './ListedVariant'
 
-import { Layout, TextField, FormLayout, Select, Button } from '@shopify/polaris';
+import { Layout, TextField, FormLayout, Select, Button, ChoiceList } from '@shopify/polaris';
 import { userInfo } from 'os';
 
 export default class Main extends Component {
@@ -20,6 +20,7 @@ export default class Main extends Component {
             listOfSearchedProduct: [],
             lifyedSearch: [],
 
+            typeOfModification: "inventaire",
             selectedProductsByUser: [],
             selectedProductsObjects: [],
             lifyedModif: [],
@@ -32,7 +33,6 @@ export default class Main extends Component {
         //  Logique pour le OnClick Event
         document.querySelector('body').addEventListener('click', (event) => {
             if (event.target.tagName.toLowerCase() === 'button' && event.target.id !== "") {
-                console.log("eventtarget", event.target);
                 let isAlreadyInArray = false;
                 this.state.selectedProductsByUser.forEach((id) => {
                     if (event.target.id === id) isAlreadyInArray = true;
@@ -66,7 +66,8 @@ export default class Main extends Component {
     //  Search
     searchFetch = () => {
         //  On reset l'array "selectedProduct by User" et "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
-        this.setState({ selectedProductsByUser: [], lifyedSearch: [], isSearchLoading: true })
+        //this.setState({ selectedProductsByUser: [], lifyedSearch: [], isSearchLoading: true })
+        this.setState({ lifyedSearch: [], isSearchLoading: true })
         return fetch('/shopify/api/products.json')
             .then(response => response.json())
             .then(responseJson => {
@@ -92,7 +93,7 @@ export default class Main extends Component {
     }
     renderSearchList = () => {
         let lify = this.state.listOfSearchedProduct.map((product) => {
-            return <ListedProduct title={product.title} id={product.id} checked={false} />
+            return <ListedProduct title={product.title} id={product.id} checked={false} selectedProductsByUser={this.state.selectedProductsByUser} />
         })
         this.setState({ lifyedSearch: lify })
     }
@@ -107,7 +108,7 @@ export default class Main extends Component {
             })
         })
         let lify = listObjects.map((product) => {
-            return <ProductModif title={product.title} variants={product.variants} checked={false} />
+            return <ListedVariant title={product.title} variants={product.variants} checked={false} />
         })
         this.setState({ lifyedModif: lify })
     }
@@ -153,14 +154,13 @@ export default class Main extends Component {
 
 
 
-
-
-
     //  Handlers
     handleSelectChange = (value) => { this.setState({ categorySelect: value }) }
     handleSearchChange = (value) => { this.setState({ searchInput: value }) }
     handleQuantityChange = (value) => { this.setState({ quantityInput: value }) }
     handlePriceChange = (value) => { this.setState({ priceInput: value }) }
+    handleTypeOfModificationChange = (value) => { this.setState({ typeOfModification: value }) }
+
 
 
     //  Test Stuff 1417274753089
@@ -210,7 +210,9 @@ export default class Main extends Component {
     }
 
 
+
     render() {
+        console.log("parent list", this.state.selectedProductsByUser)
         const options = [
             { label: "Poches", value: "poches" },
             { label: "Bas", value: "bas" },
@@ -218,7 +220,7 @@ export default class Main extends Component {
             { label: "Case Téléphone", value: "case" },
         ]
         return (
-            <div>
+            <div >
                 <div style={{ border: '2px solid black', padding: '5px', display: 'flex', justifyContent: 'space-around' }} >
                     Debug
                     <Button size="slim" onClick={this.checkObj}>Check State</Button>
@@ -228,18 +230,32 @@ export default class Main extends Component {
                 <div style={{ height: '15px' }} />
 
                 <FormLayout.Group>
-                    <TextField
-                        label="Rechercher"
-                        onChange={this.handleSearchChange}
-                        value={this.state.searchInput}
-                        placeholder="exemple: Leg Day"
+                    <div style={{ width: "170px" }}>
+                        <TextField
+                            label="Rechercher"
+                            onChange={this.handleSearchChange}
+                            value={this.state.searchInput}
+                            placeholder="exemple: Leg Day"
+                        />
+                    </div>
+                    <div style={{ width: "170px" }}>
+                        <Select
+                            label="Catégorie"
+                            options={options}
+                            onChange={this.handleSelectChange}
+                            value={this.state.categorySelect}
+                        />
+                    </div>
+
+                    <ChoiceList
+                        choices={[
+                            { label: "Changer l'inventaire", value: 'inventaire' },
+                            { label: "Changer le prix", value: 'prix' },
+                        ]}
+                        selected={this.state.typeOfModification}
+                        onChange={this.handleTypeOfModificationChange}
                     />
-                    <Select
-                        label="Catégorie"
-                        options={options}
-                        onChange={this.handleSelectChange}
-                        value={this.state.categorySelect}
-                    />
+
                 </FormLayout.Group>
                 <div style={{ height: '10px' }} />
                 <Button fullWidth={true} loading={this.state.isSearchLoading} size="slim" onClick={this.searchFetch}>Rechercher</Button>
@@ -251,8 +267,8 @@ export default class Main extends Component {
                 <hr />
 
                 <Button fullWidth={true} onClick={this.renderModifList} size="slim">Modifier les produits sélectionnés</Button>
-
                 <hr />
+
                 <ul>
                     {this.state.lifyedModif}
                 </ul>
@@ -266,7 +282,8 @@ export default class Main extends Component {
                 <div style={{ height: '15px' }} />
 
                 <Button primary fullWidth={true} onClick={this.applyChanges} >Appliquer les changements</Button>
-            </div >
+            </div>
+
         )
     }
 }

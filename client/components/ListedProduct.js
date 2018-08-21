@@ -11,12 +11,22 @@ export default class ListedProduct extends Component {
         }
     }
 
+    componentDidUpdate = (prevProps, prevState) => {
+        //console.log(this.props.selectedProductsByUser)
+        console.log(this.props)
+        if (this.props.selectedProductsByUser !== prevProps.selectedProductsByUser) console.log("props changed")
+    }
+
     handleChange = () => {
         if (this.state.checked === false) {
             this.setState({ checked: true })
         } else if (this.state.checked === true) {
             this.setState({ checked: false })
         }
+    }
+
+    checkIfPartOfList = () => {
+
     }
 
     render() {

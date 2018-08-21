@@ -24,7 +24,7 @@ export default class Size extends Component {
     }
 
     render() {
-
+        console.log("size compo", this.props.variantId)
         return (
             <Button onClick={this.handleChange}>
                 {this.props.title}

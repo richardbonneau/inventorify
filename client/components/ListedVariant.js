@@ -4,7 +4,7 @@ import Size from './Size'
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
-export default class ProductModif extends Component {
+export default class ListedVariant extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -16,7 +16,9 @@ export default class ProductModif extends Component {
     componentDidMount = () => {
         console.log("props modif", this.props)
         let elements = this.props.variants.map((variant) => {
-            return <Size title={variant.title} checked={false} />
+            console.log(variant)
+            console.log(variant.option1)
+            return <Size title={variant.option1} variantId={variant.id} checked={false} />
         })
         this.setState({ sizeElements: elements })
     }
@@ -36,11 +38,7 @@ export default class ProductModif extends Component {
                 <Card title={this.props.title} sectioned>
                     Variantes
                     <div />
-                    <Button onClick={this.handleChange}>
-                        All
-                        <Checkbox checked={this.state.checked} />
-                    </Button>
-                    <div />
+
                     {this.state.sizeElements}
 
                 </Card>
