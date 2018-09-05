@@ -5,6 +5,7 @@ https://9eab69d9.ngrok.io/shopify/auth/callback
 dezoutil inventory_item_id: 13106935496769
 
 
+
 # Shopify Node App
 
 The goal of this example app is to provide a starting point for Shopify app developers so that they will be able to quickly
