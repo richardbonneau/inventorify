@@ -51,6 +51,7 @@ const registerWebhook = function (shopDomain, accessToken, webhook) {
   );
 }
 
+
 const app = express();
 const isDevelopment = NODE_ENV !== 'production';
 
