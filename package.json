@@ -13,7 +13,7 @@
   },
   "engines": {
     "node": "8.11.3",
-    "npm": "6.1.0"
+    "yarn": "1.7.0"
   },
   "browsers": [
     "last 3 chrome versions",
