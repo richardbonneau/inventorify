@@ -9,11 +9,9 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-server.listen(port, '0.0.0.0');
-
-// server.listen(port, err => {
-//   if (err) {
-//     return console.log('😫', chalk.red(err));
-//   }
-//   console.log(`🚀 Now listening on port ${chalk.green(port)}`);
-// });
+server.listen(port, err => {
+  if (err) {
+    return console.log('😫', chalk.red(err));
+  }
+  console.log(`🚀 Now listening on port ${chalk.green(port)}`);
+});
