@@ -4,7 +4,6 @@ https://9eab69d9.ngrok.io/shopify/auth/callback
 
 dezoutil inventory_item_id: 13106935496769
 
-Force
 
 # Shopify Node App
 
