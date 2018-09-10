@@ -14,11 +14,13 @@ export default class ListedVariant extends Component {
     }
 
     componentDidMount = () => {
-        console.log("props modif", this.props)
         let elements = this.props.variants.map((variant) => {
-            console.log(variant)
-            console.log(variant.option1)
-            return <Size title={variant.option1} variantId={variant.id} checked={false} />
+
+            return <Size
+                title={variant.option1}
+                variantId={variant.id}
+                inventoryId={variant.inventory_item_id}
+                checked={false} />
         })
         this.setState({ sizeElements: elements })
     }

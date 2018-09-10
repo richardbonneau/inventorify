@@ -12,8 +12,6 @@ export default class ListedProduct extends Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        //console.log(this.props.selectedProductsByUser)
-        console.log(this.props)
         if (this.props.selectedProductsByUser !== prevProps.selectedProductsByUser) console.log("props changed")
     }
 

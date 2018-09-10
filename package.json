@@ -45,14 +45,13 @@
     "react-object-inspector": "^0.2.1",
     "react-redux": "^5.0.5",
     "redis": "^2.7.1",
-    "redux": "^3.6.0",
+    "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "shopify-api-node": "^2.11.0",
     "sqlite3": "^3.1.9",
     "url": "^0.11.0",
     "webpack": "^2.6.1",
-    "webpack-dev-middleware": "^3.2.0",
     "webpack-hot-middleware": "^2.18.0",
     "webpack-middleware": "^1.5.1"
   },
@@ -77,6 +76,7 @@
     "react-hot-loader": "^3.0.0-beta.7",
     "style-loader": "^0.18.2",
     "webpack": "^2.6.1",
+    "webpack-dev-middleware": "^2.0.6",
     "webpack-dev-server": "^2.4.5"
   }
 }

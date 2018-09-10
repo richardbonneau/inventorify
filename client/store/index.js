@@ -2,6 +2,8 @@ import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import logger from 'redux-logger';
 
+
+
 const requestFields = {
   verb: 'POST',
   path: '/products.json',
@@ -20,10 +22,44 @@ const initState = {
   requestInProgress: false,
   requestError: null,
   responseBody: '',
+
+  inventoryIds: [],
+  priceIds: []
 };
+
 
 function reducer(state = initState, action) {
   switch (action.type) {
+
+    case "ADD_INVENTORY_ID":
+      return {
+        ...state,
+        inventoryIds: [
+          ...state.inventoryIds,
+          action.payload
+        ]
+      };
+    case "REMOVE_INVENTORY_ID":
+      return {
+        ...state,
+        inventoryIds: state.inventoryIds.filter((item) => item !== action.payload)
+      };
+
+    case "ADD_PRICE_ID":
+      return {
+        ...state,
+        priceIds: [
+          ...state.priceIds,
+          action.payload
+        ]
+      };
+
+    case "REMOVE_PRICE_ID":
+      return {
+        ...state,
+        priceIds: state.priceIds.filter((item) => item !== action.payload)
+      }
+
     case 'UPDATE_VERB':
       return {
         ...state,
@@ -81,3 +117,7 @@ const middleware = applyMiddleware(thunkMiddleware, logger);
 const store = createStore(reducer, middleware);
 
 export default store;
+
+
+
+

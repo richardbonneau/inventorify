@@ -79,3 +79,12 @@ function requestErrorAction(requestError) {
     },
   };
 }
+
+
+// Richard
+
+export const addInventoryId = inventoryId => ({ type: "ADD_INVENTORY_ID", payload: inventoryId });
+export const removeInventoryId = inventoryId => ({ type: "REMOVE_INVENTORY_ID", payload: inventoryId });
+
+export const addPriceId = priceId => ({ type: "ADD_PRICE_ID", payload: priceId });
+export const removePriceId = priceId => ({ type: "REMOVE_PRICE_ID", payload: priceId })

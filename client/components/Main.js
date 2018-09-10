@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 
+import store from "../store/index";
+
+
 import ListedProduct from './ListedProduct'
 import ListedVariant from './ListedVariant'
 
 import { Layout, TextField, FormLayout, Select, Button, ChoiceList } from '@shopify/polaris';
-import { userInfo } from 'os';
 
 export default class Main extends Component {
     storeLocation = 14069366849;
@@ -22,10 +24,13 @@ export default class Main extends Component {
 
             typeOfModification: "inventaire",
             selectedProductsByUser: [],
-            selectedProductsObjects: [],
             lifyedModif: [],
+            selectedVariantsByUser: [],
             quantityInput: "",
             priceInput: "",
+
+            isApplyInventoryLoading: false,
+            isApplyPricesLoading: false,
         }
     }
 
@@ -61,6 +66,7 @@ export default class Main extends Component {
             }
         })
     }
+
 
 
     //  Search
@@ -99,6 +105,7 @@ export default class Main extends Component {
     }
 
 
+
     //  Modif
     renderModifList = () => {
         let listObjects = [];
@@ -112,44 +119,81 @@ export default class Main extends Component {
         })
         this.setState({ lifyedModif: lify })
     }
+    applyChangesToInventory = () => {
+        //  The use of this loop is to apply change to every product that needs change
+        //  Let's have an array of all the inventoryIds i want to modify, and assign each of the id to the inventoryId var as we go through the loop
 
-    applyChanges = () => {
-        for (let i = 0; i < 2; i++) {
-            let variantId = 12952003969089;
-            let inventoryId = 13106935496769;
-            if (i === 1) variantId = 12952004001857;
-            if (i === 1) inventoryId = 13081242042433;
+        this.setState({ isApplyInventoryLoading : true })
+
+        let inventoryIdsFromGlobalState = store.getState().inventoryIds;
+        let array = new Array;
+        var fetches = [];
+        for (let i = 0; i < inventoryIdsFromGlobalState.length; i++) {
 
             let inventoryBody = {
-                "inventory_item_id": inventoryId,
+                "inventory_item_id": inventoryIdsFromGlobalState[i],
                 "location_id": this.storeLocation,
-                "available": 66
+                "available": Number(this.state.quantityInput)
             }
+
+            console.log(inventoryIdsFromGlobalState[i]);
+
+            fetches.push(
+                fetch('/shopify/api/inventory_levels/set.json', {
+                    method: "POST",
+                    body: JSON.stringify(inventoryBody)
+                })
+                    .then(response => response.json())
+                    .then(responseJson => {
+                        console.log(responseJson);
+                        array.push(responseJson)
+                    })
+            );
+        }
+
+        Promise.all(fetches).then(() => {
+            console.log("all", array.length, "fetches done")
+            this.setState({ isApplyInventoryLoading : false })
+        });
+    }
+
+
+
+    applyChangesToPrice = () => {
+        this.setState({ isApplyPricesLoading : true })
+
+        let priceIdsFromGlobalState = store.getState().priceIds;
+        let array = new Array;
+        var fetches = [];
+        for (let i = 0; i < priceIdsFromGlobalState.length; i++) {
+
             let priceBody = {
                 "variant": {
-                    "id": variantId,
-                    "price": "666.0"
+                    "id": priceIdsFromGlobalState[i],
+                    "price": this.state.priceInput
                 }
             }
-            return fetch('/shopify/api/inventory_levels/set.json', {
-                method: "POST",
-                body: JSON.stringify(inventoryBody)
-            })
-                .then(response => response.json())
-                .then(responseJson => {
-                    console.log(responseJson);
-                    console.log("i", i)
-                    return fetch('/shopify/api/variants/12952003969089.json', {
-                        method: "PUT",
-                        body: JSON.stringify(priceBody)
-                    })
-                        .then(response => response.json())
-                        .then(responseJson => {
-                            console.log(responseJson)
-                            console.log("i", i)
-                        })
+
+            console.log(priceIdsFromGlobalState[i]);
+
+
+            fetches.push(
+                fetch('/shopify/api/variants/' + priceIdsFromGlobalState[i] + '.json', {
+                    method: "PUT",
+                    body: JSON.stringify(priceBody)
                 })
+                    .then(response => response.json())
+                    .then(responseJson => {
+                        console.log(responseJson);
+                        array.push(responseJson)
+                    })
+            );
         }
+
+        Promise.all(fetches).then(() => {
+            console.log("all", array.length, "fetches done")
+            this.setState({ isApplyPricesLoading : false })
+        });
     }
 
 
@@ -163,7 +207,6 @@ export default class Main extends Component {
 
 
 
-    //  Test Stuff 1417274753089
     testFetch = (value) => {
         let inventoryBody = {
             "inventory_item_id": 13106935496769,
@@ -191,28 +234,15 @@ export default class Main extends Component {
                     .then(responseJson => console.log(responseJson))
             })
     }
-    testPostFetch = (value) => {
-        let priceBody = {
-            "variant": {
-                "id": 12952003969089,
-                "price": "99.00"
-            }
-        }
-        return fetch('/shopify/api/variants/12952003969089.json', {
-            method: "PUT",
-            body: JSON.stringify(priceBody)
-        })
-            .then(response => response.json())
-            .then(responseJson => console.log(responseJson))
+    checkReduxState = (value) => {
+        console.log("reduxState", store.getState())
     }
     checkObj = (value) => {
         console.log("state", this.state)
     }
 
 
-
     render() {
-        console.log("parent list", this.state.selectedProductsByUser)
         const options = [
             { label: "Poches", value: "poches" },
             { label: "Bas", value: "bas" },
@@ -221,24 +251,25 @@ export default class Main extends Component {
         ]
         return (
             <div >
+                {/* DEBUG STUFF */}
                 <div style={{ border: '2px solid black', padding: '5px', display: 'flex', justifyContent: 'space-around' }} >
                     Debug
                     <Button size="slim" onClick={this.checkObj}>Check State</Button>
                     <Button size="slim" onClick={this.testFetch}>Test Fetch</Button>
-                    <Button size="slim" onClick={this.testPostFetch}>Test Post Fetch</Button>
+                    <Button size="slim" onClick={this.checkReduxState}>Check Redux State</Button>
                 </div>
                 <div style={{ height: '15px' }} />
 
                 <FormLayout.Group>
-                    <div style={{ width: "170px" }}>
+                    <div style={{ width: "400px" }}>
                         <TextField
                             label="Rechercher"
                             onChange={this.handleSearchChange}
                             value={this.state.searchInput}
-                            placeholder="exemple: Leg Day"
+                            placeholder="Exemple: Leg Day"
                         />
                     </div>
-                    <div style={{ width: "170px" }}>
+                    <div style={{ width: "400px" }}>
                         <Select
                             label="Catégorie"
                             options={options}
@@ -247,14 +278,6 @@ export default class Main extends Component {
                         />
                     </div>
 
-                    <ChoiceList
-                        choices={[
-                            { label: "Changer l'inventaire", value: 'inventaire' },
-                            { label: "Changer le prix", value: 'prix' },
-                        ]}
-                        selected={this.state.typeOfModification}
-                        onChange={this.handleTypeOfModificationChange}
-                    />
 
                 </FormLayout.Group>
                 <div style={{ height: '10px' }} />
@@ -274,6 +297,7 @@ export default class Main extends Component {
                 </ul>
                 <hr />
 
+
                 <FormLayout.Group>
                     <TextField label="Quantité" type="number" onChange={this.handleQuantityChange} value={this.state.quantityInput} />
                     <TextField label="Prix" prefix="$" type="number" onChange={this.handlePriceChange} value={this.state.priceInput} />
@@ -281,7 +305,10 @@ export default class Main extends Component {
 
                 <div style={{ height: '15px' }} />
 
-                <Button primary fullWidth={true} onClick={this.applyChanges} >Appliquer les changements</Button>
+                <FormLayout.Group>
+                    <Button primary fullWidth={true} onClick={this.applyChangesToInventory} loading={this.state.isApplyInventoryLoading} >Changer Inventaire</Button>
+                    <Button primary fullWidth={true} onClick={this.applyChangesToPrice} loading={this.state.isApplyPricesLoading} >Changer Prix</Button>
+                </FormLayout.Group>
             </div>
 
         )
