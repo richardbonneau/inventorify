@@ -120,7 +120,7 @@ export default class Main extends Component {
             })
         })
         let lify = listObjects.map((product) => {
-            return <ListedVariant title={product.title} variants={product.variants} checked={false} />
+            return <ListedVariant title={product.title} productId={product.id} variants={product.variants} checked={false} />
         })
         this.setState({ lifyedModif: lify })
     }

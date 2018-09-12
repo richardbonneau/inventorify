@@ -4,27 +4,39 @@ import { addInventoryId, removeInventoryId, addPriceId, removePriceId } from "..
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
-export default class Size extends Component {
+export default class SingleVariantBlock extends Component {
     constructor(props) {
         super(props);
         this.state = {
             checked: false
-        }
+        };
     }
 
     componentDidMount = () => {
-
+        store.subscribe(() => {
+            this.callback();
+        })
     }
+
+    callback = () => {
+        store.getState().productIds.forEach((id) => {
+            if (id === this.props.productId) {
+                this.handleChange();
+            }
+        })
+    }
+
+
 
     handleChange = () => {
         if (this.state.checked === false) {
-            this.setState({ checked: true })
-            store.dispatch(addInventoryId(this.props.inventoryId))
-            store.dispatch(addPriceId(this.props.variantId))
+            this.setState({ checked: true });
+            store.dispatch(addInventoryId(this.props.inventoryId));
+            store.dispatch(addPriceId(this.props.variantId));
         } else if (this.state.checked === true) {
-            this.setState({ checked: false })
-            store.dispatch(removeInventoryId(this.props.inventoryId))
-            store.dispatch(removePriceId(this.props.variantId))
+            this.setState({ checked: false });
+            store.dispatch(removeInventoryId(this.props.inventoryId));
+            store.dispatch(removePriceId(this.props.variantId));
         }
     }
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import Size from './Size'
+import SingleVariantBlock from './SingleVariantBlock'
+import MultipleSelectionButton from './MultipleSelectionButton'
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
@@ -16,12 +17,14 @@ export default class ListedVariant extends Component {
     componentDidMount = () => {
         let elements = this.props.variants.map((variant) => {
 
-            return <Size
+            return <SingleVariantBlock
                 size={variant.option1}
                 color={variant.option2}
+                productId={this.props.productId}
                 variantId={variant.id}
                 inventoryId={variant.inventory_item_id}
-                checked={false} />
+                checked={false}
+            />
         })
         this.setState({ sizeElements: elements })
     }
@@ -39,6 +42,10 @@ export default class ListedVariant extends Component {
         return (
             <li >
                 <Card title={this.props.title} sectioned>
+                    <MultipleSelectionButton
+                        productId={this.props.productId}
+                    />
+                    <div />
                     Variantes
                     <div />
 

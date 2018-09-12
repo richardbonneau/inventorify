@@ -87,4 +87,7 @@ export const addInventoryId = inventoryId => ({ type: "ADD_INVENTORY_ID", payloa
 export const removeInventoryId = inventoryId => ({ type: "REMOVE_INVENTORY_ID", payload: inventoryId });
 
 export const addPriceId = priceId => ({ type: "ADD_PRICE_ID", payload: priceId });
-export const removePriceId = priceId => ({ type: "REMOVE_PRICE_ID", payload: priceId })
+export const removePriceId = priceId => ({ type: "REMOVE_PRICE_ID", payload: priceId });
+
+export const addProductId = productId => ({ type: "ADD_PRODUCT_ID", payload: productId });
+export const removeProductId = productId => ({ type: "REMOVE_PRODUCT_ID", payload: productId })

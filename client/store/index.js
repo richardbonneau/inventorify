@@ -24,7 +24,9 @@ const initState = {
   responseBody: '',
 
   inventoryIds: [],
-  priceIds: []
+  priceIds: [],
+
+  productIds: []
 };
 
 
@@ -58,6 +60,21 @@ function reducer(state = initState, action) {
       return {
         ...state,
         priceIds: state.priceIds.filter((item) => item !== action.payload)
+      }
+
+    case "ADD_PRODUCT_ID":
+      return {
+        ...state,
+        productIds: [
+          ...state.productIds,
+          action.payload
+        ]
+      }
+
+    case "REMOVE_PRODUCT_ID":
+      return {
+        ...state,
+        productIds: state.productIds.filter((item) => item !== action.payload)
       }
 
     case 'UPDATE_VERB':
