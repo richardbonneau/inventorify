@@ -68,6 +68,11 @@ export default class Main extends Component {
     }
 
 
+    onKeyPressSearch = (event) => {
+        if (event.which === 13) {
+            this.searchFetch();
+        }
+    }
 
     //  Search
     searchFetch = () => {
@@ -123,7 +128,7 @@ export default class Main extends Component {
         //  The use of this loop is to apply change to every product that needs change
         //  Let's have an array of all the inventoryIds i want to modify, and assign each of the id to the inventoryId var as we go through the loop
 
-        this.setState({ isApplyInventoryLoading : true })
+        this.setState({ isApplyInventoryLoading: true })
 
         let inventoryIdsFromGlobalState = store.getState().inventoryIds;
         let array = new Array;
@@ -153,14 +158,14 @@ export default class Main extends Component {
 
         Promise.all(fetches).then(() => {
             console.log("all", array.length, "fetches done")
-            this.setState({ isApplyInventoryLoading : false })
+            this.setState({ isApplyInventoryLoading: false })
         });
     }
 
 
 
     applyChangesToPrice = () => {
-        this.setState({ isApplyPricesLoading : true })
+        this.setState({ isApplyPricesLoading: true })
 
         let priceIdsFromGlobalState = store.getState().priceIds;
         let array = new Array;
@@ -192,7 +197,7 @@ export default class Main extends Component {
 
         Promise.all(fetches).then(() => {
             console.log("all", array.length, "fetches done")
-            this.setState({ isApplyPricesLoading : false })
+            this.setState({ isApplyPricesLoading: false })
         });
     }
 
@@ -261,12 +266,12 @@ export default class Main extends Component {
                 <div style={{ height: '15px' }} />
 
                 <FormLayout.Group>
-                    <div style={{ width: "400px" }}>
+                    <div onKeyPress={this.onKeyPressSearch} style={{ width: "400px" }}>
                         <TextField
                             label="Rechercher"
                             onChange={this.handleSearchChange}
                             value={this.state.searchInput}
-                            placeholder="Exemple: Leg Day"
+                            placeholder="Exemple: T-Shirt"
                         />
                     </div>
                     <div style={{ width: "400px" }}>

@@ -17,7 +17,8 @@ export default class ListedVariant extends Component {
         let elements = this.props.variants.map((variant) => {
 
             return <Size
-                title={variant.option1}
+                size={variant.option1}
+                color={variant.option2}
                 variantId={variant.id}
                 inventoryId={variant.inventory_item_id}
                 checked={false} />

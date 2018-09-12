@@ -31,8 +31,16 @@ export default class Size extends Component {
     render() {
         return (
             <Button onClick={this.handleChange}>
-                {this.props.title}
-                <Checkbox checked={this.state.checked} />
+                {this.props.color}
+                <div />
+                {this.props.size}
+                <div />
+                <div style={{ display: "flex", justifyContent: "center" }} >
+                    <div style={{ width: "0.8rem" }} />
+                    <Checkbox checked={this.state.checked} />
+                </div>
+
+
             </Button>
         )
     }
