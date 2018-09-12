@@ -4,8 +4,8 @@ const chalk = require('chalk');
 const http = require('http');
 const app = require('../server');
 
-// const port = process.env.PORT || '3000';
-const port = process.env.PORT;
+const port = process.env.PORT || '3000';
+//const port = process.env.PORT;
 app.set('port', port);
 
 const server = http.createServer(app);
