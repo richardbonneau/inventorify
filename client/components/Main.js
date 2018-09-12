@@ -62,6 +62,7 @@ export default class Main extends Component {
                             })
                     })
                 }
+
                 //console.log("products in list: ", this.state.selectedProductsByUser)
             }
         })
