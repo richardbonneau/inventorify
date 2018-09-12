@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import store from "../store/index";
 
-
 import ListedProduct from './ListedProduct'
 import ListedVariant from './ListedVariant'
 
@@ -67,17 +66,17 @@ export default class Main extends Component {
         })
     }
 
-
+    //  If the user presses enter it clicks the search button
     onKeyPressSearch = (event) => {
         if (event.which === 13) {
             this.searchFetch();
         }
     }
 
+
     //  Search
     searchFetch = () => {
         //  On reset l'array "selectedProduct by User" et "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
-        //this.setState({ selectedProductsByUser: [], lifyedSearch: [], isSearchLoading: true })
         this.setState({ lifyedSearch: [], isSearchLoading: true })
         return fetch('/shopify/api/products.json')
             .then(response => response.json())
@@ -110,7 +109,6 @@ export default class Main extends Component {
     }
 
 
-
     //  Modif
     renderModifList = () => {
         let listObjects = [];
@@ -124,25 +122,22 @@ export default class Main extends Component {
         })
         this.setState({ lifyedModif: lify })
     }
+
+
+    //  Apply Changes
     applyChangesToInventory = () => {
         //  The use of this loop is to apply change to every product that needs change
         //  Let's have an array of all the inventoryIds i want to modify, and assign each of the id to the inventoryId var as we go through the loop
-
         this.setState({ isApplyInventoryLoading: true })
-
         let inventoryIdsFromGlobalState = store.getState().inventoryIds;
         let array = new Array;
         var fetches = [];
         for (let i = 0; i < inventoryIdsFromGlobalState.length; i++) {
-
             let inventoryBody = {
                 "inventory_item_id": inventoryIdsFromGlobalState[i],
                 "location_id": this.storeLocation,
                 "available": Number(this.state.quantityInput)
             }
-
-            console.log(inventoryIdsFromGlobalState[i]);
-
             fetches.push(
                 fetch('/shopify/api/inventory_levels/set.json', {
                     method: "POST",
@@ -155,33 +150,24 @@ export default class Main extends Component {
                     })
             );
         }
-
         Promise.all(fetches).then(() => {
             console.log("all", array.length, "fetches done")
             this.setState({ isApplyInventoryLoading: false })
         });
     }
 
-
-
     applyChangesToPrice = () => {
         this.setState({ isApplyPricesLoading: true })
-
         let priceIdsFromGlobalState = store.getState().priceIds;
         let array = new Array;
         var fetches = [];
         for (let i = 0; i < priceIdsFromGlobalState.length; i++) {
-
             let priceBody = {
                 "variant": {
                     "id": priceIdsFromGlobalState[i],
                     "price": this.state.priceInput
                 }
             }
-
-            console.log(priceIdsFromGlobalState[i]);
-
-
             fetches.push(
                 fetch('/shopify/api/variants/' + priceIdsFromGlobalState[i] + '.json', {
                     method: "PUT",
@@ -194,13 +180,11 @@ export default class Main extends Component {
                     })
             );
         }
-
         Promise.all(fetches).then(() => {
             console.log("all", array.length, "fetches done")
             this.setState({ isApplyPricesLoading: false })
         });
     }
-
 
 
     //  Handlers
@@ -211,7 +195,7 @@ export default class Main extends Component {
     handleTypeOfModificationChange = (value) => { this.setState({ typeOfModification: value }) }
 
 
-
+    //  Debug Functions
     testFetch = (value) => {
         let inventoryBody = {
             "inventory_item_id": 13106935496769,
@@ -245,6 +229,7 @@ export default class Main extends Component {
     checkObj = (value) => {
         console.log("state", this.state)
     }
+
 
 
     render() {
