@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+
+import { connect } from "react-redux"
 import store from "../store/index"
 import { addInventoryId, removeInventoryId, addPriceId, removePriceId } from "../actions/index"
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
-export default class SingleVariantBlock extends Component {
+class SingleVariantBlock extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -12,11 +14,6 @@ export default class SingleVariantBlock extends Component {
         };
     }
 
-    componentDidMount = () => {
-        store.subscribe(() => {
-            this.callback();
-        })
-    }
 
     callback = () => {
         store.getState().productIds.forEach((id) => {
@@ -31,6 +28,8 @@ export default class SingleVariantBlock extends Component {
     handleChange = () => {
         if (this.state.checked === false) {
             this.setState({ checked: true });
+            store.dispatch(removeInventoryId(this.props.inventoryId));
+            store.dispatch(removePriceId(this.props.variantId));
             store.dispatch(addInventoryId(this.props.inventoryId));
             store.dispatch(addPriceId(this.props.variantId));
         } else if (this.state.checked === true) {
@@ -57,3 +56,11 @@ export default class SingleVariantBlock extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        selectAllVariants = state.selectAllVariants
+    }
+}
+
+export default connect(mapStateToProps)(SingleVariantBlock)

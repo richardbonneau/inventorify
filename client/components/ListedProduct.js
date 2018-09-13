@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 
-import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
+import { connect } from "react-redux"
+import store from "../store/index"
 
-export default class ListedProduct extends Component {
+import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
+import { addProductId, removeProductId } from '../actions';
+
+
+class ListedProduct extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -12,19 +17,28 @@ export default class ListedProduct extends Component {
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (this.props.selectedProductsByUser !== prevProps.selectedProductsByUser) console.log("props changed")
+        if (this.props.selectAllProducts !== prevProps.selectAllProducts) {
+            if (this.props.selectAllProducts === true) {
+                store.dispatch(removeProductId(this.props.id));
+                store.dispatch(addProductId(this.props.id));
+                this.setState({ checked: true });
+            } else {
+                store.dispatch(removeProductId(this.props.id));
+                this.setState({ checked: false });
+            }
+        }
+
     }
 
     handleChange = () => {
         if (this.state.checked === false) {
-            this.setState({ checked: true })
+            store.dispatch(addProductId(this.props.id));
+            this.setState({ checked: true });
         } else if (this.state.checked === true) {
-            this.setState({ checked: false })
+            store.dispatch(removeProductId(this.props.id));
+            this.setState({ checked: false });
+
         }
-    }
-
-    checkIfPartOfList = () => {
-
     }
 
     render() {
@@ -34,13 +48,26 @@ export default class ListedProduct extends Component {
                     id={this.props.id}
                     onClick={this.handleChange}
                 >
-                    {this.props.title}
+                    <div style={{ display: "flex" }} >
 
-                    <Checkbox
-                        checked={this.state.checked}
-                    />
+                        {this.props.title}
+                        <div style={{ width: "10px" }} />
+                        <Checkbox
+                            checked={this.state.checked}
+                        />
+                    </div>
+
                 </Button>
             </li>
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        selectAllProducts: state.selectAllProducts,
+        productIds: state.productIds
+    };
+};
+
+export default connect(mapStateToProps)(ListedProduct)

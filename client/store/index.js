@@ -23,15 +23,46 @@ const initState = {
   requestError: null,
   responseBody: '',
 
+  selectAllProducts: false,
+  productIds: [],
+
+  selectAllVariants: [],
   inventoryIds: [],
   priceIds: [],
 
-  productIds: []
+
 };
 
 
 function reducer(state = initState, action) {
   switch (action.type) {
+
+    case "SELECT_ALL_PRODUCTS":
+      return {
+        ...state,
+        selectAllProducts: action.payload
+      };
+
+    case "UNSELECT_ALL_PRODUCTS":
+      return {
+        ...state,
+        selectAllProducts: false
+      };
+
+    case "ADD_PRODUCT_ID":
+      return {
+        ...state,
+        productIds: [
+          ...state.productIds,
+          action.payload
+        ]
+      }
+
+    case "REMOVE_PRODUCT_ID":
+      return {
+        ...state,
+        productIds: state.productIds.filter((item) => item !== action.payload)
+      }
 
     case "ADD_INVENTORY_ID":
       return {
@@ -60,21 +91,6 @@ function reducer(state = initState, action) {
       return {
         ...state,
         priceIds: state.priceIds.filter((item) => item !== action.payload)
-      }
-
-    case "ADD_PRODUCT_ID":
-      return {
-        ...state,
-        productIds: [
-          ...state.productIds,
-          action.payload
-        ]
-      }
-
-    case "REMOVE_PRODUCT_ID":
-      return {
-        ...state,
-        productIds: state.productIds.filter((item) => item !== action.payload)
       }
 
     case 'UPDATE_VERB':

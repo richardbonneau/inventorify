@@ -90,4 +90,6 @@ export const addPriceId = priceId => ({ type: "ADD_PRICE_ID", payload: priceId }
 export const removePriceId = priceId => ({ type: "REMOVE_PRICE_ID", payload: priceId });
 
 export const addProductId = productId => ({ type: "ADD_PRODUCT_ID", payload: productId });
-export const removeProductId = productId => ({ type: "REMOVE_PRODUCT_ID", payload: productId })
+export const removeProductId = productId => ({ type: "REMOVE_PRODUCT_ID", payload: productId });
+
+export const selectAllProducts = (bool) => ({ type: "SELECT_ALL_PRODUCTS", payload: bool });

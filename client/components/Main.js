@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 
+import { connect } from "react-redux"
 import store from "../store/index";
+
+import SelectAllProducts from './SelectAllProducts'
 
 import ListedProduct from './ListedProduct'
 import ListedVariant from './ListedVariant'
 
+
 import { Layout, TextField, FormLayout, Select, Button, ChoiceList } from '@shopify/polaris';
 
-export default class Main extends Component {
+class Main extends Component {
     storeLocation = 14069366849;
 
     constructor(props) {
@@ -33,38 +37,6 @@ export default class Main extends Component {
         }
     }
 
-    componentDidMount() {
-        //  Logique pour le OnClick Event
-        document.querySelector('body').addEventListener('click', (event) => {
-            if (event.target.tagName.toLowerCase() === 'button' && event.target.id !== "") {
-                let isAlreadyInArray = false;
-                this.state.selectedProductsByUser.forEach((id) => {
-                    if (event.target.id === id) isAlreadyInArray = true;
-                })
-                if (isAlreadyInArray === false) {
-                    this.setState({
-                        selectedProductsByUser: this.state.selectedProductsByUser.concat(event.target.id)
-                    })
-                } else {
-                    let indexOfItemWeWillRemove = this.state.selectedProductsByUser.indexOf(event.target.id)
-                    this.setState({
-                        selectedProductsByUser:
-                            this.state.selectedProductsByUser.filter(el => {
-                                if (this.state.selectedProductsByUser.indexOf(el) !== indexOfItemWeWillRemove) {
-                                    return true;
-                                }
-                                else {
-                                    //  Putting this var to -1 ensures that we won't filter any more elements
-                                    indexOfItemWeWillRemove = -1;
-                                    return false;
-                                }
-                            })
-                    })
-                }
-                //console.log("products in list: ", this.state.selectedProductsByUser)
-            }
-        })
-    }
 
     //  If the user presses enter it clicks the search button
     onKeyPressSearch = (event) => {
@@ -76,7 +48,7 @@ export default class Main extends Component {
 
     //  Search
     searchFetch = () => {
-        //  On reset l'array "selectedProduct by User" et "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
+        //  On reset l'array "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
         this.setState({ lifyedSearch: [], isSearchLoading: true })
         return fetch('/shopify/api/products.json')
             .then(response => response.json())
@@ -112,7 +84,7 @@ export default class Main extends Component {
     //  Modif
     renderModifList = () => {
         let listObjects = [];
-        this.state.selectedProductsByUser.forEach((selected) => {
+        this.props.productIds.forEach((selected) => {
             this.state.listOfSearchedProduct.forEach((searched) => {
                 if (Number(selected) === searched.id) { listObjects.push(searched); }
             })
@@ -137,7 +109,7 @@ export default class Main extends Component {
                 "inventory_item_id": inventoryIdsFromGlobalState[i],
                 "location_id": this.storeLocation,
                 "available": Number(this.state.quantityInput)
-            }
+            };
             fetches.push(
                 fetch('/shopify/api/inventory_levels/set.json', {
                     method: "POST",
@@ -146,7 +118,7 @@ export default class Main extends Component {
                     .then(response => response.json())
                     .then(responseJson => {
                         console.log(responseJson);
-                        array.push(responseJson)
+                        array.push(responseJson);
                     })
             );
         }
@@ -274,6 +246,7 @@ export default class Main extends Component {
                 <Button fullWidth={true} loading={this.state.isSearchLoading} size="slim" onClick={this.searchFetch}>Rechercher</Button>
 
                 <hr />
+                <SelectAllProducts />
                 <ul>
                     {this.state.lifyedSearch}
                 </ul>
@@ -304,3 +277,11 @@ export default class Main extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        productIds: state.productIds
+    };
+};
+
+export default connect(mapStateToProps)(Main)

@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 
+import { connect } from "react-redux"
+
 import SingleVariantBlock from './SingleVariantBlock'
-import MultipleSelectionButton from './MultipleSelectionButton'
+import SelectAllVariants from './SelectAllVariants'
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
-export default class ListedVariant extends Component {
+class ListedVariant extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -42,10 +44,10 @@ export default class ListedVariant extends Component {
         return (
             <li >
                 <Card title={this.props.title} sectioned>
-                    <MultipleSelectionButton
+                    <SelectAllVariants
                         productId={this.props.productId}
                     />
-                    <div />
+                    <div style={{ height: "20px" }} />
                     Variantes
                     <div />
 
@@ -56,3 +58,11 @@ export default class ListedVariant extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        selectAllVariants: state.selectAllVariants
+    }
+}
+
+export default connect(mapStateToProps)(ListedVariant)
