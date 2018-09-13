@@ -59,7 +59,7 @@ class SingleVariantBlock extends Component {
 
 const mapStateToProps = state => {
     return {
-        selectAllVariants = state.selectAllVariants
+        selectAllVariants: state.selectAllVariants
     }
 }
 
