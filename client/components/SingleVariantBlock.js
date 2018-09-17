@@ -24,7 +24,6 @@ class SingleVariantBlock extends Component {
     }
 
 
-
     handleChange = () => {
         if (this.state.checked === false) {
             this.setState({ checked: true });
@@ -38,6 +37,7 @@ class SingleVariantBlock extends Component {
             store.dispatch(removePriceId(this.props.variantId));
         }
     }
+
 
     render() {
         return (
