@@ -72,7 +72,6 @@
     "webpack-middleware": "^1.5.1"
   },
   "devDependencies": {
-    "redis": "^2.7.1",
     "ajv": "^6.0.0",
     "eslint": "3.19.0",
     "eslint-plugin-prettier": "^2.1.2",
