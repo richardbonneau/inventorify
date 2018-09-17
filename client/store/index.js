@@ -37,16 +37,25 @@ const initState = {
 function reducer(state = initState, action) {
   switch (action.type) {
 
+    case "ADD_ALL_VARIANTS":
+      return {
+        ...state,
+        selectAllVariants: [
+          ...state.selectAllVariants,
+          action.payload
+        ]
+      }
+
+    case "REMOVE_ALL_VARIANTS":
+      return {
+        ...state,
+        selectAllVariants: state.selectAllVariants.filter((item) => item !== action.payload)
+      }
+
     case "SELECT_ALL_PRODUCTS":
       return {
         ...state,
         selectAllProducts: action.payload
-      };
-
-    case "UNSELECT_ALL_PRODUCTS":
-      return {
-        ...state,
-        selectAllProducts: false
       };
 
     case "ADD_PRODUCT_ID":

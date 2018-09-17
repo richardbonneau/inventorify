@@ -4,10 +4,8 @@ import { connect } from "react-redux"
 import store from "../store/index";
 
 import SelectAllProducts from './SelectAllProducts'
-
 import ListedProduct from './ListedProduct'
 import ListedVariant from './ListedVariant'
-
 
 import { Layout, TextField, FormLayout, Select, Button, ChoiceList } from '@shopify/polaris';
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import store from "../store/index"
-import { addProductId, removeProductId } from "../actions/index"
+import { addAllVariants, removeAllVariants } from "../actions/index"
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
 
@@ -12,21 +12,13 @@ export default class SelectAllVariants extends Component {
         }
     }
 
-    componentDidMount = () => {
-        // store.subscribe(() => {
-        //     console.log("store was changed")
-        //     store.getState();
-        // })
-
-    }
-
     handleChange = () => {
         if (this.state.checked === false) {
-            store.dispatch(addProductId(this.props.productId))
+            store.dispatch(addAllVariants(this.props.productId))
             this.setState({ checked: true })
 
         } else if (this.state.checked === true) {
-            store.dispatch(removeProductId(this.props.productId))
+            store.dispatch(removeAllVariants(this.props.productId))
             this.setState({ checked: false })
         }
     }

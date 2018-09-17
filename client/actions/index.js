@@ -93,3 +93,6 @@ export const addProductId = productId => ({ type: "ADD_PRODUCT_ID", payload: pro
 export const removeProductId = productId => ({ type: "REMOVE_PRODUCT_ID", payload: productId });
 
 export const selectAllProducts = (bool) => ({ type: "SELECT_ALL_PRODUCTS", payload: bool });
+
+export const addAllVariants = (productId) => ({ type: "ADD_ALL_VARIANTS", payload: productId });
+export const removeAllVariants = (productId) => ({ type: "REMOVE_ALL_VARIANTS", payload: productId });
