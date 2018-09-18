@@ -6,19 +6,20 @@ import SingleVariantBlock from './SingleVariantBlock'
 import SelectAllVariants from './SelectAllVariants'
 
 import { Layout, Stack, Card, Checkbox, Button } from '@shopify/polaris';
+import SelectColorVariants from './SelectColorVariants';
 
 class ListedVariant extends Component {
     constructor(props) {
         super(props);
         this.state = {
             checked: false,
-            sizeElements: []
+            lifyedVariantBlocks: [],
+            lifyedColorVariants: []
         }
     }
 
     componentDidMount = () => {
-        let elements = this.props.variants.map((variant) => {
-
+        let variantBlocks = this.props.variants.map((variant) => {
             return <SingleVariantBlock
                 size={variant.option1}
                 color={variant.option2}
@@ -28,7 +29,47 @@ class ListedVariant extends Component {
                 checked={false}
             />
         })
-        this.setState({ sizeElements: elements })
+        let colorVariants = []
+
+
+
+        // this.props.variants.forEach(i => {
+        //     if (colorVariants === undefined || colorVariants.length == 0) colorVariants.push(i.option2)
+        //     let doAddToArray = true;
+        //     colorVariants.forEach(j => {
+        //         if (i.option2 === j) {
+        //             doAddToArray = false;
+        //         }
+        //     })
+        //     if (doAddToArray === true) colorVariants.push(i.option2)
+        // })
+
+        let variantsObj = {}
+        this.props.variants.forEach(i => {
+            console.log(i)
+            if (colorVariants === undefined || colorVariants.length == 0) colorVariants.push(i.option2)
+            let doAddToArray = true;
+            colorVariants.forEach(j => {
+                if (i.option2 === j) {
+                    doAddToArray = false;
+                }
+            })
+            if (doAddToArray === true) colorVariants.push(i.option2)
+        })
+
+
+
+        let lifyedColorVariants = colorVariants.map((color) => {
+            return <div style={{ display: "flex" }} >
+                <div style={{ width: "10px" }} />
+                <SelectColorVariants
+                    title={color}
+                /> </div>
+        })
+        this.setState({
+            lifyedVariantBlocks: variantBlocks,
+            lifyedColorVariants: lifyedColorVariants
+        })
     }
 
     handleChange = () => {
@@ -39,22 +80,24 @@ class ListedVariant extends Component {
         }
     }
 
-
     render() {
         return (
             <li >
                 <Card title={this.props.title} sectioned>
-                    <SelectAllVariants
-                        productId={this.props.productId}
-                    />
+                    <div style={{ display: "flex" }}>
+                        <SelectAllVariants
+                            productId={this.props.productId}
+                        />
+
+                        {this.state.lifyedColorVariants}
+                    </div>
                     <div style={{ height: "20px" }} />
                     Variantes
                     <div />
 
-                    {this.state.sizeElements}
-
+                    {this.state.lifyedVariantBlocks}
                 </Card>
-            </li>
+            </li >
         )
     }
 }
