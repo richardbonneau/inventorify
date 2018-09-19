@@ -29,43 +29,31 @@ class ListedVariant extends Component {
                 checked={false}
             />
         })
-        let colorVariants = []
-
-
-
-        // this.props.variants.forEach(i => {
-        //     if (colorVariants === undefined || colorVariants.length == 0) colorVariants.push(i.option2)
-        //     let doAddToArray = true;
-        //     colorVariants.forEach(j => {
-        //         if (i.option2 === j) {
-        //             doAddToArray = false;
-        //         }
-        //     })
-        //     if (doAddToArray === true) colorVariants.push(i.option2)
-        // })
 
         let variantsObj = {}
         this.props.variants.forEach(i => {
-            console.log(i)
-            if (colorVariants === undefined || colorVariants.length == 0) colorVariants.push(i.option2)
-            let doAddToArray = true;
-            colorVariants.forEach(j => {
-                if (i.option2 === j) {
-                    doAddToArray = false;
-                }
-            })
-            if (doAddToArray === true) colorVariants.push(i.option2)
+            if (variantsObj[i.option2] === undefined) {
+                variantsObj[i.option2] = { variantId: [i.id], invId: [i.inventory_item_id] }
+            } else {
+                variantsObj[i.option2].variantId.push(i.id);
+                variantsObj[i.option2].invId.push(i.inventory_item_id);
+            }
         })
+        let lifyedColorVariants = [];
+        for (var key in variantsObj) {
+            if (variantsObj.hasOwnProperty(key)) {
+                lifyedColorVariants.push(
+                    <div style={{ display: "flex" }} >
+                        <div style={{ width: "10px" }} />
+                        <SelectColorVariants
+                            title={key}
+                            arrVariantId={variantsObj[key].variantId}
+                            arrInvId={variantsObj[key].invId}
+                        /> </div>
+                )
+            }
+        }
 
-
-
-        let lifyedColorVariants = colorVariants.map((color) => {
-            return <div style={{ display: "flex" }} >
-                <div style={{ width: "10px" }} />
-                <SelectColorVariants
-                    title={color}
-                /> </div>
-        })
         this.setState({
             lifyedVariantBlocks: variantBlocks,
             lifyedColorVariants: lifyedColorVariants

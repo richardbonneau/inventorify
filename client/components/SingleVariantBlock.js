@@ -14,24 +14,42 @@ class SingleVariantBlock extends Component {
         };
     }
 
+    componentDidMount = () => {
+        //console.log("singleprops", this.props.variantId)
+    }
+
     componentDidUpdate = (prevProps) => {
         if (this.props.selectAllVariants !== prevProps.selectAllVariants) {
-            let isIdPresent = false;
+            let isProductIdPresent = false;
+            let isVariantIdPresent = false;
+
             this.props.selectAllVariants.forEach((i) => {
-                if (i === this.props.productId && isIdPresent === false) {
-                    isIdPresent = true;
-                    this.setState({ checked: true });
+                if (i === this.props.productId && isProductIdPresent === false) {
+                    isProductIdPresent = true;
                     store.dispatch(removeInventoryId(this.props.inventoryId));
                     store.dispatch(removePriceId(this.props.variantId));
                     store.dispatch(addInventoryId(this.props.inventoryId));
                     store.dispatch(addPriceId(this.props.variantId));
+                    this.setState({ checked: true });
                 }
             })
-            if (isIdPresent === false) {
+            if (isProductIdPresent === false) {
                 this.setState({ checked: false });
                 store.dispatch(removeInventoryId(this.props.inventoryId));
                 store.dispatch(removePriceId(this.props.variantId));
             }
+
+
+            this.props.colorVariantIds.forEach((i) => {
+                if (i === this.props.variantId && isVariantIdPresent === false)  {
+                    isVariantIdPresent = true;
+                    store.dispatch(removeInventoryId(this.props.inventoryId));
+                    store.dispatch(removePriceId(this.props.variantId));
+                    store.dispatch(addInventoryId(this.props.inventoryId));
+                    store.dispatch(addPriceId(this.props.variantId));
+                    this.setState({ checked: true })
+                }
+            })
         }
     }
 
@@ -67,7 +85,8 @@ class SingleVariantBlock extends Component {
 
 const mapStateToProps = state => {
     return {
-        selectAllVariants: state.selectAllVariants
+        selectAllVariants: state.selectAllVariants,
+        colorVariantIds: state.colorVariantIds
     }
 }
 

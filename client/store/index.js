@@ -30,12 +30,36 @@ const initState = {
   inventoryIds: [],
   priceIds: [],
 
-
+  colorVariantIds: []
 };
 
 
 function reducer(state = initState, action) {
   switch (action.type) {
+
+    case "ADD_COLOR_VARIANT_ID":
+      return {
+        ...state,
+        colorVariantIds: [
+          ...state.colorVariantIds,
+          ...action.payload
+        ]
+      }
+
+    case "REMOVE_COLOR_VARIANT_ID":
+      let ret = [...state.colorVariantIds];
+      action.payload.forEach((i) => {
+        let isIdPresent = false;
+        ret.forEach((j) => {
+          if (j === i && isIdPresent === false) isIdPresent = true;
+        })
+        if (isIdPresent === true) ret.splice(ret.indexOf(i), 1)
+      })
+
+      return {
+        ...state,
+        colorVariantIds: [...ret]
+      }
 
     case "ADD_ALL_VARIANTS":
       return {

@@ -96,3 +96,6 @@ export const selectAllProducts = (bool) => ({ type: "SELECT_ALL_PRODUCTS", paylo
 
 export const addAllVariants = (productId) => ({ type: "ADD_ALL_VARIANTS", payload: productId });
 export const removeAllVariants = (productId) => ({ type: "REMOVE_ALL_VARIANTS", payload: productId });
+
+export const addColorVariantId = id => ({ type: "ADD_COLOR_VARIANT_ID", payload: id });
+export const removeColorVariantId = id => ({ type: "REMOVE_COLOR_VARIANT_ID", payload: id });
