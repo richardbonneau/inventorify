@@ -47,18 +47,20 @@ function reducer(state = initState, action) {
       }
 
     case "SELECT_EVERY_COLOR":
-      let retEveryColor = { ...state.selectEveryColor }
-      retEveryColor[action.payload] = true;
+      let retSelectEveryColor = { ...state.selectEveryColor }
+      retSelectEveryColor[action.payload] = true;
       return {
         ...state,
-        selectEveryColor: retEveryColor
+        selectEveryColor: retSelectEveryColor
       }
 
 
     case "UNSELECT_EVERY_COLOR":
+      let retUnselectEveryColor = { ...state.selectEveryColor }
+      retUnselectEveryColor[action.payload] = false;
       return {
         ...state,
-        selectEveryColor: state.selectEveryColor.filter((item) => item !== action.payload)
+        selectEveryColor: retUnselectEveryColor
       }
 
     case "SELECT_EVERY_VARIANTS":
