@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 
 import { connect } from "react-redux"
 import store from "../store/index";
+import { createAllPossibleVariants } from "../actions/index"
 
 import SelectAllProducts from './SelectAllProducts'
 import ListedProduct from './ListedProduct'
 import ListedVariant from './ListedVariant'
+import SelectEveryVariants from './SelectEveryVariants'
+import SelectEveryColor from './SelectEveryColor'
 
 import { Layout, TextField, FormLayout, Select, Button, ChoiceList } from '@shopify/polaris';
 
@@ -25,6 +28,7 @@ class Main extends Component {
 
             typeOfModification: "inventaire",
             selectedProductsByUser: [],
+            lifyedSelectAllVariants: [],
             lifyedModif: [],
             selectedVariantsByUser: [],
             quantityInput: "",
@@ -32,6 +36,8 @@ class Main extends Component {
 
             isApplyInventoryLoading: false,
             isApplyPricesLoading: false,
+
+            lifyedSelectEveryColor: []
         }
     }
 
@@ -43,8 +49,8 @@ class Main extends Component {
         }
     }
 
-
     //  Search
+    //  REFACTORING: state is updated too many times
     searchFetch = () => {
         //  On reset l'array "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
         this.setState({ lifyedSearch: [], isSearchLoading: true })
@@ -55,6 +61,7 @@ class Main extends Component {
                 this.putDataInState(responseJson);
             })
             .then(() => { this.searchForKeywords(this.state.searchInput, this.state.fetched) })
+            .then(() => { this.createObjectInGlobalState() })
             .then(() => { this.renderSearchList() })
     }
     putDataInState = (object) => {
@@ -71,6 +78,28 @@ class Main extends Component {
         })
         this.setState({ listOfSearchedProduct: filteredArr })
     }
+    createObjectInGlobalState = () => {
+        let obj = {};
+        this.state.fetched.forEach((product) => {
+            product.variants.forEach((variant) => { obj[variant.option2] = false; })
+        })
+        store.dispatch(createAllPossibleVariants(obj))
+
+        let lify = [];
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                lify.push(
+                    <div>
+                        <div style={{ width: "10px" }} />
+                        <SelectEveryColor
+                            propsKey={key}
+
+                        /> </div>
+                )
+            }
+        }
+        this.setState({ lifyedSelectEveryColor: lify })
+    }
     renderSearchList = () => {
         let lify = this.state.listOfSearchedProduct.map((product) => {
             return <ListedProduct title={product.title} id={product.id} checked={false} selectedProductsByUser={this.state.selectedProductsByUser} />
@@ -81,6 +110,7 @@ class Main extends Component {
 
     //  Modif
     renderModifList = () => {
+        //  REFACTORING: cleaner, leaner
         let listObjects = [];
         this.props.productIds.forEach((selected) => {
             this.state.listOfSearchedProduct.forEach((searched) => {
@@ -123,6 +153,8 @@ class Main extends Component {
         Promise.all(fetches).then(() => {
             console.log("all", array.length, "fetches done")
             this.setState({ isApplyInventoryLoading: false })
+            alert("all", array.length, "fetches done, page reloading");
+            location.reload();
         });
     }
 
@@ -153,6 +185,8 @@ class Main extends Component {
         Promise.all(fetches).then(() => {
             console.log("all", array.length, "fetches done")
             this.setState({ isApplyPricesLoading: false })
+            alert("all" + array.length + "fetches done, page reloading");
+            location.reload();
         });
     }
 
@@ -205,9 +239,9 @@ class Main extends Component {
     render() {
         const options = [
             { label: "Poches", value: "poches" },
-            { label: "Bas", value: "bas" },
-            { label: "Boxer", value: "boxer" },
-            { label: "Case Téléphone", value: "case" },
+            // { label: "Bas", value: "bas" },
+            // { label: "Boxer", value: "boxer" },
+            // { label: "Case Téléphone", value: "case" },
         ]
         return (
             <div >
@@ -245,6 +279,7 @@ class Main extends Component {
 
                 <hr />
                 <SelectAllProducts />
+
                 <ul>
                     {this.state.lifyedSearch}
                 </ul>
@@ -252,7 +287,10 @@ class Main extends Component {
 
                 <Button fullWidth={true} onClick={this.renderModifList} size="slim">Modifier les produits sélectionnés</Button>
                 <hr />
-
+                <div style={{ display: "flex" }} >
+                    <SelectEveryVariants />
+                    {this.state.lifyedSelectEveryColor}
+                </div>
                 <ul>
                     {this.state.lifyedModif}
                 </ul>

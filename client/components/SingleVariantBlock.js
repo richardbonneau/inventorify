@@ -21,7 +21,6 @@ class SingleVariantBlock extends Component {
     componentDidUpdate = (prevProps) => {
         if (this.props.selectAllVariants !== prevProps.selectAllVariants) {
             let isProductIdPresent = false;
-            let isVariantIdPresent = false;
 
             this.props.selectAllVariants.forEach((i) => {
                 if (i === this.props.productId && isProductIdPresent === false) {
@@ -38,18 +37,25 @@ class SingleVariantBlock extends Component {
                 store.dispatch(removeInventoryId(this.props.inventoryId));
                 store.dispatch(removePriceId(this.props.variantId));
             }
-
+        }
+        if (this.props.colorVariantIds !== prevProps.colorVariantIds) {
+            let isVariantIdPresent = false;
 
             this.props.colorVariantIds.forEach((i) => {
-                if (i === this.props.variantId && isVariantIdPresent === false)  {
+                if (i === this.props.variantId && isVariantIdPresent === false) {
                     isVariantIdPresent = true;
                     store.dispatch(removeInventoryId(this.props.inventoryId));
                     store.dispatch(removePriceId(this.props.variantId));
                     store.dispatch(addInventoryId(this.props.inventoryId));
                     store.dispatch(addPriceId(this.props.variantId));
-                    this.setState({ checked: true })
+                    this.setState({ checked: true });
                 }
             })
+            if (isVariantIdPresent === false) {
+                this.setState({ checked: false });
+                store.dispatch(removeInventoryId(this.props.inventoryId));
+                store.dispatch(removePriceId(this.props.variantId));
+            }
         }
     }
 

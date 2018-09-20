@@ -99,3 +99,9 @@ export const removeAllVariants = (productId) => ({ type: "REMOVE_ALL_VARIANTS", 
 
 export const addColorVariantId = id => ({ type: "ADD_COLOR_VARIANT_ID", payload: id });
 export const removeColorVariantId = id => ({ type: "REMOVE_COLOR_VARIANT_ID", payload: id });
+
+export const selectEveryVariants = bool => ({ type: "SELECT_EVERY_VARIANTS", payload: bool });
+
+export const createAllPossibleVariants = obj => ({ type: "CREATE_ALL_POSSIBLE_VARIANTS", payload: obj })
+export const selectEveryColor = key => ({ type: "SELECT_EVERY_COLOR", payload: key });
+export const unselectEveryColor = key => ({ type: "UNSELECT_EVERY_COLOR", payload: key });

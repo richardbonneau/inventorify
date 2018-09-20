@@ -26,6 +26,9 @@ const initState = {
   selectAllProducts: false,
   productIds: [],
 
+  selectEveryVariants: false,
+  selectEveryColor: {},
+
   selectAllVariants: [],
   inventoryIds: [],
   priceIds: [],
@@ -37,6 +40,33 @@ const initState = {
 function reducer(state = initState, action) {
   switch (action.type) {
 
+    case "CREATE_ALL_POSSIBLE_VARIANTS":
+      return {
+        ...state,
+        selectEveryColor: action.payload
+      }
+
+    case "SELECT_EVERY_COLOR":
+      let retEveryColor = { ...state.selectEveryColor }
+      retEveryColor[action.payload] = true;
+      return {
+        ...state,
+        selectEveryColor: retEveryColor
+      }
+
+
+    case "UNSELECT_EVERY_COLOR":
+      return {
+        ...state,
+        selectEveryColor: state.selectEveryColor.filter((item) => item !== action.payload)
+      }
+
+    case "SELECT_EVERY_VARIANTS":
+      return {
+        ...state,
+        selectEveryVariants: action.payload
+      };
+
     case "ADD_COLOR_VARIANT_ID":
       return {
         ...state,
@@ -46,7 +76,9 @@ function reducer(state = initState, action) {
         ]
       }
 
+
     case "REMOVE_COLOR_VARIANT_ID":
+      //  REFACTORING:
       let ret = [...state.colorVariantIds];
       action.payload.forEach((i) => {
         let isIdPresent = false;
