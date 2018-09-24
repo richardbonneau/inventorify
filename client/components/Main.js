@@ -47,9 +47,16 @@ class Main extends Component {
             fetched: [],
             isFetchLoading: false,
             listProductsToModify: [],
+
+            variantIds: [],
+            inventoryIds: []
+
         }
     }
 
+    componentDidMount = () => {
+        this.fetchAllProducts()
+    }
 
     //  New
     fetchAllProducts = () => {
@@ -77,36 +84,135 @@ class Main extends Component {
 
     }
     handleBaseChange = (value) => {
-        this.setState({ base: value }, () => this.filterProducts())
+        this.setState({ base: value }, () => this.filterProducts());
 
+    }
+
+    handleSizeChange = (value) => {
+        this.setState({ size: value }, () => this.filterProducts());
     }
 
     handleColorChange = (value) => {
-        this.setState({ color: value })
+        this.setState({ color: value }, () => this.filterProducts());
 
 
     }
-    handleSizeChange = (value) => { this.setState({ size: value }) }
+
 
 
     filterProducts = () => {
-        let filterGender = this.state.fetched.filter((product) => product.title.toLowerCase().includes(this.state.gender))
-        let filterBase = filterGender.filter((product) => product.title.toLowerCase().includes(this.state.base))
+        let filterGender = this.state.fetched.filter((product) => product.title.toLowerCase().includes(this.state.gender));
+        let filterBase = filterGender.filter((product) => product.title.toLowerCase().includes(this.state.base));
+        let filterSize = [...filterBase];
+        filterSize.forEach((product) => {
+            if (this.state.size !== "") {
+                let newVariants = [];
+                product.variants.forEach((variant) => {
+                    if (variant.option1 === this.state.size) newVariants.push(variant);
+                })
+                product.variants = newVariants
+            }
+        })
+        let filterColor = [...filterSize];
+        filterColor.forEach((product) => {
+            if (this.state.color !== "") {
+                let newVariants = [];
+                product.variants.forEach((variant) => {
+                    if (variant.option2 === this.state.color) newVariants.push(variant);
+                })
+                product.variants = newVariants
+            }
+        })
 
-        //  TODO:
-        //  filterSize = 
-        filterBase.forEach((product) => {
+        let letVariantIds = [];
+        let letInventoryIds = [];
+        filterColor.forEach((product) => {
             product.variants.forEach((variant) => {
+                letVariantIds.push(variant.id);
+                letInventoryIds.push(variant.inventory_item_id);
 
             })
         })
-        console.log("filterBase", filterBase)
 
-        this.setState({ listProductsToModify: filterBase }, () => {
-            console.log("filteredList", filterBase)
+        this.setState({
+            listProductsToModify: filterColor,
+            variantIds: letVariantIds,
+            inventoryIds: letInventoryIds
+        }, () => {
+            console.log("filteredList", filterColor[0].variants)
             console.log("state", this.state.listProductsToModify)
         })
 
+    }
+
+    //  Apply Changes
+    applyChangesToInventory = () => {
+        //  The use of this loop is to apply change to every product that needs change
+        //  Let's have an array of all the inventoryIds i want to modify, and assign each of the id to the inventoryId var as we go through the loop
+        this.setState({ isApplyInventoryLoading: true })
+        let array = new Array();
+        var fetches = [];
+        for (let i = 0; i < this.state.inventoryIds.length; i++) {
+            let inventoryBody = {
+                "inventory_item_id": this.state.inventoryIds[i],
+                "location_id": this.storeLocation,
+                "available": Number(this.state.quantityInput)
+            };
+            fetches.push(
+                fetch('/shopify/api/inventory_levels/set.json', {
+                    method: "POST",
+                    body: JSON.stringify(inventoryBody)
+                })
+                    .then(response => response.json())
+                    .then(responseJson => {
+                        console.log(responseJson);
+                        array.push(responseJson);
+                    })
+                    .then((value) => new Promise(resolve =>  {
+                        console.log(value)
+                        setTimeout(() => resolve, 500)
+                    }))
+
+
+            );
+        }
+        Promise.all(fetches).then(() => {
+            console.log("all", array.length, "fetches done")
+            this.setState({ isApplyInventoryLoading: false })
+            alert("all", array.length, "fetches done, page reloading");
+            location.reload();
+        });
+    }
+
+    applyChangesToPrice = () => {
+        this.setState({ isApplyPricesLoading: true })
+        let array = new Array();
+        var fetches = [];
+        for (let i = 0; i < this.state.variantIds.length; i++) {
+            let priceBody = {
+                "variant": {
+                    "id": this.state.variantIds[i],
+                    "price": this.state.priceInput
+                }
+            }
+            fetches.push(
+                fetch('/shopify/api/variants/' + this.state.variantIds[i] + '.json', {
+                    method: "PUT",
+                    body: JSON.stringify(priceBody)
+                })
+                    .then(response => response.json())
+                    .then(responseJson => {
+                        console.log(responseJson);
+                        array.push(responseJson)
+                    })
+            );
+        }
+        Promise.all(fetches).then(() => {
+            console.log("all", array.length, "fetches done")
+            this.setState({ isApplyPricesLoading: false })
+            alert("all" + array.length + "fetches done, page reloading");
+            location.reload();
+        });
     }
 
 
@@ -186,71 +292,7 @@ class Main extends Component {
     }
 
 
-    //  Apply Changes
-    applyChangesToInventory = () => {
-        //  The use of this loop is to apply change to every product that needs change
-        //  Let's have an array of all the inventoryIds i want to modify, and assign each of the id to the inventoryId var as we go through the loop
-        this.setState({ isApplyInventoryLoading: true })
-        let inventoryIdsFromGlobalState = store.getState().inventoryIds;
-        let array = new Array;
-        var fetches = [];
-        for (let i = 0; i < inventoryIdsFromGlobalState.length; i++) {
-            let inventoryBody = {
-                "inventory_item_id": inventoryIdsFromGlobalState[i],
-                "location_id": this.storeLocation,
-                "available": Number(this.state.quantityInput)
-            };
-            fetches.push(
-                fetch('/shopify/api/inventory_levels/set.json', {
-                    method: "POST",
-                    body: JSON.stringify(inventoryBody)
-                })
-                    .then(response => response.json())
-                    .then(responseJson => {
-                        console.log(responseJson);
-                        array.push(responseJson);
-                    })
-            );
-        }
-        Promise.all(fetches).then(() => {
-            console.log("all", array.length, "fetches done")
-            this.setState({ isApplyInventoryLoading: false })
-            alert("all", array.length, "fetches done, page reloading");
-            location.reload();
-        });
-    }
 
-    applyChangesToPrice = () => {
-        this.setState({ isApplyPricesLoading: true })
-        let priceIdsFromGlobalState = store.getState().priceIds;
-        let array = new Array;
-        var fetches = [];
-        for (let i = 0; i < priceIdsFromGlobalState.length; i++) {
-            let priceBody = {
-                "variant": {
-                    "id": priceIdsFromGlobalState[i],
-                    "price": this.state.priceInput
-                }
-            }
-            fetches.push(
-                fetch('/shopify/api/variants/' + priceIdsFromGlobalState[i] + '.json', {
-                    method: "PUT",
-                    body: JSON.stringify(priceBody)
-                })
-                    .then(response => response.json())
-                    .then(responseJson => {
-                        console.log(responseJson);
-                        array.push(responseJson)
-                    })
-            );
-        }
-        Promise.all(fetches).then(() => {
-            console.log("all", array.length, "fetches done")
-            this.setState({ isApplyPricesLoading: false })
-            alert("all" + array.length + "fetches done, page reloading");
-            location.reload();
-        });
-    }
 
 
     //  Handlers
@@ -319,18 +361,18 @@ class Main extends Component {
 
         const taille = [
             { label: "Tous", value: "" },
-            { label: "S", value: "s" },
-            { label: "M", value: "m" },
-            { label: "L", value: "l" },
-            { label: "XL", value: "xl" }
+            { label: "S", value: "S" },
+            { label: "M", value: "M" },
+            { label: "L", value: "L" },
+            { label: "XL", value: "XL" }
         ]
 
         const couleur = [
             { label: "Tous", value: "" },
-            { label: "Black", value: "black" },
-            { label: "Charcoal", value: "charcoal" },
-            { label: "Grey", value: "grey" },
-            { label: "White", value: "white" },
+            { label: "Black", value: "Black" },
+            { label: "Charcoal", value: "Charcoal" },
+            { label: "Grey", value: "Grey" },
+            { label: "White", value: "White" },
         ]
 
 
