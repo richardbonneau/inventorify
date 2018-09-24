@@ -22,10 +22,8 @@ class Main extends Component {
             categorySelect: "poches",
             isSearchLoading: false,
 
-            fetched: [],
             listOfSearchedProduct: [],
             lifyedSearch: [],
-
             typeOfModification: "inventaire",
             selectedProductsByUser: [],
             lifyedSelectAllVariants: [],
@@ -33,21 +31,85 @@ class Main extends Component {
             selectedVariantsByUser: [],
             quantityInput: "",
             priceInput: "",
-
             isApplyInventoryLoading: false,
             isApplyPricesLoading: false,
+            lifyedSelectEveryColor: [],
 
-            lifyedSelectEveryColor: []
+
+
+            gender: "",
+            base: "",
+            size: "",
+            color: "",
+
+
+
+            fetched: [],
+            isFetchLoading: false,
+            listProductsToModify: [],
         }
     }
 
 
-    //  If the user presses enter it clicks the search button
-    onKeyPressSearch = (event) => {
-        if (event.which === 13) {
-            this.searchFetch();
-        }
+    //  New
+    fetchAllProducts = () => {
+        //  On reset l'array "lifyed list" pour avoir un clean slate lorsque le user fait une nouvelle recherche
+        this.setState({ listProducts: [], isFetchLoading: true })
+        return fetch('/shopify/api/products.json')
+            .then(response => response.json())
+            .then(responseJson => {
+                this.setState({ isFetchLoading: false })
+                this.putDataInState(responseJson);
+            })
     }
+    //  REFACTORINg: this could probably be one line of code instead of 5
+    putDataInState = (object) => {
+        let list = [];
+        object.products.forEach(product => {
+            list.push(product);
+        })
+        this.setState({ fetched: list })
+    }
+
+
+    handleGenderChange = (value) => {
+        this.setState({ gender: value }, () => this.filterProducts());
+
+    }
+    handleBaseChange = (value) => {
+        this.setState({ base: value }, () => this.filterProducts())
+
+    }
+
+    handleColorChange = (value) => {
+        this.setState({ color: value })
+
+
+    }
+    handleSizeChange = (value) => { this.setState({ size: value }) }
+
+
+    filterProducts = () => {
+        let filterGender = this.state.fetched.filter((product) => product.title.toLowerCase().includes(this.state.gender))
+        let filterBase = filterGender.filter((product) => product.title.toLowerCase().includes(this.state.base))
+
+        //  TODO:
+        //  filterSize = 
+        filterBase.forEach((product) => {
+            product.variants.forEach((variant) => {
+
+            })
+        })
+        console.log("filterBase", filterBase)
+
+        this.setState({ listProductsToModify: filterBase }, () => {
+            console.log("filteredList", filterBase)
+            console.log("state", this.state.listProductsToModify)
+        })
+
+    }
+
+
 
     //  Search
     //  REFACTORING: state is updated too many times
@@ -64,13 +126,13 @@ class Main extends Component {
             .then(() => { this.createObjectInGlobalState() })
             .then(() => { this.renderSearchList() })
     }
-    putDataInState = (object) => {
-        let list = [];
-        object.products.forEach(product => {
-            list.push(product);
-        })
-        this.setState({ fetched: list })
-    }
+    // putDataInState = (object) => {
+    //     let list = [];
+    //     object.products.forEach(product => {
+    //         list.push(product);
+    //     })
+    //     this.setState({ fetched: list })
+    // }
     searchForKeywords(searchInput, fetched) {
         let filteredArr = fetched.filter((product) => {
             let lowerCaseTitle = product.title.toLowerCase();
@@ -199,6 +261,9 @@ class Main extends Component {
     handleTypeOfModificationChange = (value) => { this.setState({ typeOfModification: value }) }
 
 
+
+
+
     //  Debug Functions
     testFetch = (value) => {
         let inventoryBody = {
@@ -237,12 +302,38 @@ class Main extends Component {
 
 
     render() {
-        const options = [
-            { label: "Poches", value: "poches" },
-            // { label: "Bas", value: "bas" },
-            // { label: "Boxer", value: "boxer" },
-            // { label: "Case Téléphone", value: "case" },
+        const genre = [
+            { label: "Tous", value: "" },
+            { label: "Hommes", value: "homme" },
+            { label: "Femmes", value: "femme" },
+            { label: "Enfants", value: "enfant" },
+            { label: "Bébés", value: "bébé" }
         ]
+
+        const base = [
+            { label: "Tous", value: "" },
+            { label: "T-Shirts", value: "t-shirt" },
+            { label: "V-Necks", value: "v-neck" },
+            { label: "Manches Longues", value: "manches longues" },
+        ]
+
+        const taille = [
+            { label: "Tous", value: "" },
+            { label: "S", value: "s" },
+            { label: "M", value: "m" },
+            { label: "L", value: "l" },
+            { label: "XL", value: "xl" }
+        ]
+
+        const couleur = [
+            { label: "Tous", value: "" },
+            { label: "Black", value: "black" },
+            { label: "Charcoal", value: "charcoal" },
+            { label: "Grey", value: "grey" },
+            { label: "White", value: "white" },
+        ]
+
+
         return (
             <div >
                 {/* DEBUG STUFF */}
@@ -254,6 +345,58 @@ class Main extends Component {
                 </div>
                 <div style={{ height: '15px' }} />
 
+
+                <Button fullWidth={true} loading={this.state.isFetchLoading} size="slim" onClick={this.fetchAllProducts}>Fetch</Button>
+
+
+                <div style={{ height: '15px' }} />
+                <FormLayout>
+                    <Select
+                        label="Genre"
+                        options={genre}
+                        onChange={this.handleGenderChange}
+                        value={this.state.gender}
+                    />
+                    <Select
+                        label="Base"
+                        options={base}
+                        onChange={this.handleBaseChange}
+                        value={this.state.base}
+                    />
+                    <Select
+                        label="Taille"
+                        options={taille}
+                        onChange={this.handleSizeChange}
+                        value={this.state.size}
+                    />
+                    <Select
+                        label="Couleur"
+                        options={couleur}
+                        onChange={this.handleColorChange}
+                        value={this.state.color}
+                    />
+
+                </FormLayout>
+
+                <div style={{ height: '15px' }} />
+
+                <FormLayout.Group>
+                    <TextField label="Quantité" type="number" onChange={this.handleQuantityChange} value={this.state.quantityInput} />
+                    <TextField label="Prix" prefix="$" type="number" onChange={this.handlePriceChange} value={this.state.priceInput} />
+                </FormLayout.Group>
+                <FormLayout.Group>
+                    <Button primary fullWidth={true} onClick={this.applyChangesToInventory} loading={this.state.isApplyInventoryLoading} >Changer Inventaire</Button>
+                    <Button primary fullWidth={true} onClick={this.applyChangesToPrice} loading={this.state.isApplyPricesLoading} >Changer Prix</Button>
+                </FormLayout.Group>
+                <div style={{ height: "30px" }} />
+
+
+
+
+
+
+
+
                 <FormLayout.Group>
                     <div onKeyPress={this.onKeyPressSearch} style={{ width: "400px" }}>
                         <TextField
@@ -264,12 +407,7 @@ class Main extends Component {
                         />
                     </div>
                     <div style={{ width: "400px" }}>
-                        <Select
-                            label="Catégorie"
-                            options={options}
-                            onChange={this.handleSelectChange}
-                            value={this.state.categorySelect}
-                        />
+
                     </div>
 
 
@@ -297,19 +435,10 @@ class Main extends Component {
                 <hr />
 
 
-                <FormLayout.Group>
-                    <TextField label="Quantité" type="number" onChange={this.handleQuantityChange} value={this.state.quantityInput} />
-                    <TextField label="Prix" prefix="$" type="number" onChange={this.handlePriceChange} value={this.state.priceInput} />
-                </FormLayout.Group>
 
-                <div style={{ height: '15px' }} />
 
-                <FormLayout.Group>
-                    <Button primary fullWidth={true} onClick={this.applyChangesToInventory} loading={this.state.isApplyInventoryLoading} >Changer Inventaire</Button>
-                    <Button primary fullWidth={true} onClick={this.applyChangesToPrice} loading={this.state.isApplyPricesLoading} >Changer Prix</Button>
-                </FormLayout.Group>
+
             </div>
-
         )
     }
 }
